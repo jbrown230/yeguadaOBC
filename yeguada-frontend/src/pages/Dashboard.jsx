@@ -77,10 +77,10 @@ export default function Dashboard({ metrics }) {
 
       {/* KPI Row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
-        <KpiCard label="Total de Chats Hoy" value={metrics.totalChatsToday} sub="↑ 12% vs ayer" icon="💬" color="green" style={{ animationDelay: '0.05s' }} />
-        <KpiCard label="Tasa de Resolución" value={`${metrics.resolutionRate}%`} sub="↑ 3% esta semana" icon="✅" color="teal" style={{ animationDelay: '0.1s' }} />
-        <KpiCard label="Escalados a Humano" value={`${metrics.escalationRate}%`} sub="↓ 1% vs semana pasada" icon="👤" color="gold" style={{ animationDelay: '0.15s' }} />
-        <KpiCard label="Tiempo Prom. Respuesta" value={`${avgSec}s`} sub="node-nlp local" icon="⏱️" color="stone" style={{ animationDelay: '0.2s' }} />
+        <KpiCard label="Total de Chats Hoy" value={metrics.totalChatsToday} sub="↑ 12% vs ayer" color="green" style={{ animationDelay: '0.05s' }} />
+        <KpiCard label="Tasa de Resolución" value={`${metrics.resolutionRate}%`} sub="↑ 3% esta semana" color="teal" style={{ animationDelay: '0.1s' }} />
+        <KpiCard label="Escalados a Humano" value={`${metrics.escalationRate}%`} sub="↓ 1% vs semana pasada" color="gold" style={{ animationDelay: '0.15s' }} />
+        <KpiCard label="Tiempo Prom. Respuesta" value={`${avgSec}s`} sub="node-nlp local" color="stone" style={{ animationDelay: '0.2s' }} />
       </div>
 
       {/* Charts Row */}
@@ -184,7 +184,7 @@ export default function Dashboard({ metrics }) {
                     </td>
                     <td style={{ padding: '10px 12px' }}>
                       <span style={badgeStyle(c.resolved)}>
-                        {c.resolved ? '✅ Chatbot' : '👤 Humano'}
+                        {c.resolved ? 'Chatbot' : 'Humano'}
                       </span>
                     </td>
                     <td style={{ padding: '10px 12px' }}>

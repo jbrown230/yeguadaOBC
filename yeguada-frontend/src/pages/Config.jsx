@@ -14,10 +14,10 @@ const Field = ({ label, value, type = 'text', readOnly = false, onChange }) => (
   </div>
 );
 
-const Section = ({ title, icon, children }) => (
+const Section = ({ title, children }) => (
   <div style={{ background: 'var(--card)', border: '0.5px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 20, marginBottom: 14 }}>
-    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-      <span>{icon}</span> {title}
+    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: 'var(--stone-deep)' }}>
+      {title}
     </div>
     {children}
   </div>
@@ -36,7 +36,7 @@ export default function Config({ backendOnline }) {
     <div style={{ animation: 'fadeUp 0.3s var(--ease)', maxWidth: 680 }}>
       <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Configuración del Sistema</h1>
 
-      <Section title="Backend node-nlp" icon="🧠">
+      <Section title="Backend node-nlp">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, padding: '8px 12px', borderRadius: 'var(--r-sm)', background: backendOnline ? 'var(--teal-pale)' : 'var(--gold-pale)', fontSize: 12, fontWeight: 600, color: backendOnline ? 'var(--teal)' : 'var(--gold)' }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: backendOnline ? 'var(--teal-light)' : 'var(--gold-light)', animation: backendOnline ? 'pulse 2s infinite' : 'none' }} />
           {backendOnline ? 'Backend conectado y respondiendo' : 'Backend offline — Ejecute: npm start en yeguada-backend/'}
@@ -64,7 +64,7 @@ export default function Config({ backendOnline }) {
         </div>
       </Section>
 
-      <Section title="Integración WhatsApp" icon="📱">
+      <Section title="Integración WhatsApp">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <Field label="Proveedor" value="Twilio / Meta Business API" readOnly />
           <Field label="Número" value="+507 6XXX-XXXX" />
@@ -73,7 +73,7 @@ export default function Config({ backendOnline }) {
         </div>
       </Section>
 
-      <Section title="Escalamiento a Humano" icon="👤">
+      <Section title="Escalamiento a Humano">
         {[
           { label: 'Intenciones desconocidas', checked: true },
           { label: 'Score NLP menor al umbral', checked: true },
@@ -92,7 +92,7 @@ export default function Config({ backendOnline }) {
           Cancelar
         </button>
         <button onClick={handleSave} style={{ padding: '9px 20px', background: saved ? 'var(--teal)' : 'var(--forest)', color: '#fff', border: 'none', borderRadius: 'var(--r-sm)', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}>
-          {saved ? '✅ Guardado' : 'Guardar Cambios'}
+          {saved ? 'Guardado' : 'Guardar Cambios'}
         </button>
       </div>
     </div>

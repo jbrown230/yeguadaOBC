@@ -30,7 +30,9 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 16,
+    fontSize: 10,
+    fontWeight: 800,
+    letterSpacing: '0.02em',
   },
   right: {
     display: 'flex',
@@ -103,7 +105,7 @@ export default function Topbar({ backendOnline }) {
   return (
     <header style={styles.bar}>
       <div style={styles.brand}>
-        <div style={styles.logoCircle}>🌿</div>
+        <div style={styles.logoCircle}>LY</div>
         Ecoturismo La Yeguada OBC
       </div>
 
@@ -114,7 +116,7 @@ export default function Topbar({ backendOnline }) {
         </div>
 
         <button style={styles.notifBtn}>
-          🔔
+          ◌
           <span style={styles.badge}>1</span>
         </button>
 

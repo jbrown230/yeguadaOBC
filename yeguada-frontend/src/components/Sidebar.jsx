@@ -3,10 +3,10 @@ import React from 'react';
 
 const navItems = [
   { id: 'dashboard', label: 'Panel de Control',          icon: '▦' },
-  { id: 'intents',   label: 'Gestión de Intenciones',    icon: '🎯' },
-  { id: 'kb',        label: 'Base de Conocimiento',      icon: '📚' },
-  { id: 'monitor',   label: 'Monitoreo',                 icon: '🖥️'  },
-  { id: 'config',    label: 'Configuración',             icon: '⚙️'  },
+  { id: 'intents',   label: 'Gestión de Intenciones',    icon: '◎' },
+  { id: 'kb',        label: 'Base de Conocimiento',      icon: '≡' },
+  { id: 'monitor',   label: 'Monitoreo',                 icon: '□' },
+  { id: 'config',    label: 'Configuración',             icon: '◇' },
 ];
 
 const styles = {
@@ -32,7 +32,10 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 30,
+    fontSize: 16,
+    fontWeight: 800,
+    letterSpacing: '0.02em',
+    color: 'var(--forest)',
     margin: '0 auto 10px',
     border: '2px solid var(--forest-pale)',
   },
@@ -81,7 +84,7 @@ export default function Sidebar({ activePage, onNavigate }) {
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logoArea}>
-        <div style={styles.logoEmoji}>🏔️</div>
+        <div style={styles.logoEmoji}>LY</div>
         <div style={styles.orgName}>La Yeguada OBC<br />· Chatbot Admin ·</div>
       </div>
 

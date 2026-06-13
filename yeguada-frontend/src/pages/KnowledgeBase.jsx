@@ -47,7 +47,7 @@ export default function KnowledgeBase() {
 
       {/* Search */}
       <div style={{ position: 'relative', marginBottom: 14 }}>
-        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, opacity: 0.4 }}>🔍</span>
+        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, opacity: 0.4 }}>⌕</span>
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}

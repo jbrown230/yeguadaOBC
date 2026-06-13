@@ -22,23 +22,23 @@ const localNLP = [
   { kw: ['reserv', 'apartar', 'booking', 'quiero un tour'],
     answer: 'Para reservar un tour contáctenos por WhatsApp al +507 6XXX-XXXX. Ofrecemos senderismo, cascadas y agroturismo. Reserve con 48h de anticipación. ¿Le gustaría saber más sobre algún tour?', intent: 'booking.tour' },
   { kw: ['precio', 'costo', 'cuánto', 'tarifa', 'cobr'],
-    answer: '💰 Precios:\n🥾 Senderismo básico: $25/persona\n🌊 Cascadas Celestes: $35/persona\n🌿 Tour completo + almuerzo: $45/persona\n\nGrupos 8+: 15% descuento. ¿Alguna pregunta adicional?', intent: 'pricing.info' },
+    answer: 'Precios:\n· Senderismo básico: $25/persona\n· Cascadas Celestes: $35/persona\n· Tour completo + almuerzo: $45/persona\n\nGrupos 8+: 15% descuento. ¿Alguna pregunta adicional?', intent: 'pricing.info' },
   { kw: ['guía', 'guia', 'guías', 'disponib'],
-    answer: '🧭 Contamos con guías comunitarios certificados. Temporada alta (dic-abr): reserve con 1 semana de anticipación. Temporada baja (may-nov): mayor disponibilidad. ¿Para qué fecha lo necesita?', intent: 'guide.availability' },
+    answer: 'Contamos con guías comunitarios certificados. Temporada alta (dic-abr): reserve con 1 semana de anticipación. Temporada baja (may-nov): mayor disponibilidad. ¿Para qué fecha lo necesita?', intent: 'guide.availability' },
   { kw: ['llegar', 'cómo llego', 'ubicación', 'dirección', 'dónde', 'donde'],
-    answer: '📍 Calobre, Veraguas. Desde Ciudad de Panamá: Carretera Interamericana → El Jagüito → Calobre → La Yeguada (~260 km, 4-5h). Se recomienda 4x4.', intent: 'location.directions' },
+    answer: 'Calobre, Veraguas. Desde Ciudad de Panamá: Carretera Interamericana → El Jagüito → Calobre → La Yeguada (~260 km, 4-5h). Se recomienda 4x4.', intent: 'location.directions' },
   { kw: ['actividad', 'actividades', 'qué hacen', 'qué ofrecen', 'experiencia'],
-    answer: '🌿 Ofrecemos: 🥾 Senderismo · 🌊 Cascadas Celestes · 🛶 Kayak en laguna · 🌱 Agroturismo · 🦜 Avistamiento aves (200+ sp.) · ⛺ Camping · 🎭 Talleres culturales', intent: 'general.info' },
+    answer: 'Ofrecemos: senderismo · Cascadas Celestes · kayak en laguna · agroturismo · avistamiento de aves (200+ sp.) · camping · talleres culturales.', intent: 'general.info' },
   { kw: ['camping', 'acampar', 'carpa', 'noche', 'dormir'],
-    answer: '⛺ ¡Sí! Zona natural a orillas de la Laguna y Estación ANAM con baños/duchas. Capacidad limitada — reserve con anticipación, especialmente en feriados.', intent: 'camping.info' },
+    answer: 'Sí, contamos con zona de camping a orillas de la Laguna y Estación ANAM con baños y duchas. Capacidad limitada — reserve con anticipación, especialmente en feriados.', intent: 'camping.info' },
   { kw: ['cascada', 'silampa', 'celeste', 'waterfall'],
-    answer: '🌊 Cascadas Celestes: sendero ~45 min, incluida en tour $35.\n💧 Cascada La Silampa: ~1h45 min con guía. Ambas ideales para fotografía y baño en temporada seca.', intent: 'waterfall.info' },
+    answer: 'Cascadas Celestes: sendero ~45 min, incluida en tour $35.\nCascada La Silampa: ~1h45 min con guía. Ambas ideales para fotografía y baño en temporada seca.', intent: 'waterfall.info' },
   { kw: ['horario', 'hora', 'cuando', 'cuándo', 'apertura'],
-    answer: '⏰ Tours salen a las 7:00-8:00 AM · Acceso reserva: 7:30 AM – 4:30 PM · Atención WhatsApp: lunes a domingo, horario de oficina.', intent: 'hours.info' },
+    answer: 'Tours salen a las 7:00-8:00 AM · Acceso reserva: 7:30 AM – 4:30 PM · Atención WhatsApp: lunes a domingo, horario de oficina.', intent: 'hours.info' },
   { kw: ['hola', 'buenas', 'buenos días', 'buenas tardes', 'hey'],
-    answer: '¡Hola! 👋 Soy el asistente de Ecoturismo La Yeguada OBC. Puedo ayudarte con información sobre tours, precios, cómo llegar y más. ¿En qué te puedo ayudar?', intent: 'greeting' },
+    answer: '¡Hola! Soy el asistente de Ecoturismo La Yeguada OBC. Puedo ayudarte con información sobre tours, precios, cómo llegar y más. ¿En qué te puedo ayudar?', intent: 'greeting' },
   { kw: ['gracias', 'muchas gracias', 'adiós', 'adios', 'hasta luego', 'chao'],
-    answer: '¡Con mucho gusto! 🌿 Esperamos verte pronto en La Yeguada. Para consultas adicionales, escríbenos al WhatsApp. ¡Buen día!', intent: 'farewell' },
+    answer: '¡Con mucho gusto! Esperamos verte pronto en La Yeguada. Para consultas adicionales, escríbenos al WhatsApp. ¡Buen día!', intent: 'farewell' },
 ];
 
 function localClassify(text) {
@@ -58,7 +58,7 @@ function now() {
 
 const INITIAL_MSG = {
   role: 'bot',
-  text: '¡Hola! 👋 Soy el asistente virtual de Ecoturismo La Yeguada OBC. ¿En qué puedo ayudarte hoy?',
+  text: '¡Hola! Soy el asistente virtual de Ecoturismo La Yeguada OBC. ¿En qué puedo ayudarte hoy?',
   time: now(),
   intent: null,
 };
@@ -67,7 +67,7 @@ const s = {
   panel: { width: 'var(--chat-width)', background: 'var(--card)', borderLeft: '0.5px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 },
   header: { padding: '12px 16px', borderBottom: '0.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   headerLeft: { display: 'flex', alignItems: 'center', gap: 10 },
-  botAvatar: { width: 38, height: 38, borderRadius: '50%', background: 'var(--forest-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: '1.5px solid var(--forest-light)', flexShrink: 0 },
+  botAvatar: { width: 38, height: 38, borderRadius: '50%', background: 'var(--forest-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: 'var(--forest)', letterSpacing: '0.02em', border: '1.5px solid var(--forest-light)', flexShrink: 0 },
   botName: { fontSize: 13, fontWeight: 700, color: 'var(--stone-deep)' },
   botStatus: { fontSize: 11, color: 'var(--teal-light)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 },
   statusDot: { width: 6, height: 6, borderRadius: '50%', background: 'var(--teal-light)', animation: 'pulse 2s infinite' },
@@ -146,7 +146,7 @@ const ChatPanel = React.memo(function ChatPanel({ backendOnline }) {
         const res = await sendMessage(text);
         botMsg = {
           role: 'bot',
-          text: (res.answer || 'No pude procesar esa consulta.') + (res.escalated ? '\n\n⚠️ Escalado a operador humano.' : ''),
+          text: (res.answer || 'No pude procesar esa consulta.') + (res.escalated ? '\n\nEscalado a operador humano.' : ''),
           time: now(), intent: res.intent, score: res.score, resolved: res.resolved,
         };
       } else {
@@ -156,7 +156,7 @@ const ChatPanel = React.memo(function ChatPanel({ backendOnline }) {
         const resolved = !!match;
         botMsg = match
           ? { role: 'bot', text: match.answer, time: now(), intent: match.intent, score: 0.92, resolved: true }
-          : { role: 'bot', text: '🔄 Esta consulta requiere atención personalizada. También puedes escribirnos al WhatsApp +507 6XXX-XXXX.', time: now(), intent: 'unknown', resolved: false };
+          : { role: 'bot', text: 'Esta consulta requiere atención personalizada. También puedes escribirnos al WhatsApp +507 6XXX-XXXX.', time: now(), intent: 'unknown', resolved: false };
         // Acumular métricas localmente — el dashboard las leerá en el próximo poll
         recordLocalConversation({
           sessionId: 'admin-preview',
@@ -189,7 +189,7 @@ const ChatPanel = React.memo(function ChatPanel({ backendOnline }) {
     <aside style={s.panel}>
       <div style={s.header}>
         <div style={s.headerLeft}>
-          <div style={s.botAvatar}>🤖</div>
+          <div style={s.botAvatar}>LY</div>
           <div>
             <div style={s.botName}>La Yeguada Bot</div>
             <div style={s.botStatus}>
@@ -207,7 +207,7 @@ const ChatPanel = React.memo(function ChatPanel({ backendOnline }) {
             <div style={s.msg(m.role)}>{m.text}</div>
             <div style={s.time}>{m.time}</div>
             {m.intent && m.intent !== 'unknown' && (
-              <div style={s.intentTag}>🎯 {m.intent}</div>
+              <div style={s.intentTag}>{m.intent}</div>
             )}
           </div>
         ))}
