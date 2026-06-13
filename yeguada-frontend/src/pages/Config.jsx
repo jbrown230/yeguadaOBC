@@ -41,7 +41,7 @@ export default function Config({ backendOnline }) {
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: backendOnline ? 'var(--teal-light)' : 'var(--gold-light)', animation: backendOnline ? 'pulse 2s infinite' : 'none' }} />
           {backendOnline ? 'Backend conectado y respondiendo' : 'Backend offline — Ejecute: npm start en yeguada-backend/'}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="fields-2">
           <Field label="Host" value="localhost" readOnly />
           <Field label="Puerto" value="3001" readOnly />
           <Field label="Endpoint" value="POST /api/chat" readOnly />
@@ -65,7 +65,7 @@ export default function Config({ backendOnline }) {
       </Section>
 
       <Section title="Integración WhatsApp">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="fields-2">
           <Field label="Proveedor" value="Twilio / Meta Business API" readOnly />
           <Field label="Número" value="+507 6XXX-XXXX" />
           <Field label="Webhook URL" value="https://tu-servidor.com/webhook/whatsapp" />

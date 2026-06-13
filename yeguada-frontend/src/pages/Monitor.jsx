@@ -21,13 +21,13 @@ export default function Monitor(props) {
     <div style={{ animation: 'fadeUp 0.3s var(--ease)' }}>
       <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Monitoreo de Conversaciones</h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 16 }}>
+      <div className="kpi-grid-3">
         <KpiCard label="Activas Ahora" value="3" sub="2 chatbot · 1 humano" color="teal" />
         <KpiCard label="Completadas Hoy" value={Math.round(totalChatsToday * (resolutionRate / 100))} sub={`${resolutionRate}% tasa de resolución`} color="green" />
         <KpiCard label="En Espera Humano" value={Math.round(totalChatsToday * (escalationRate / 100))} sub={`${escalationRate}% de escalamiento`} color="gold" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="monitor-charts">
         <div style={{ background: 'var(--card)', border: '0.5px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Chats por Intención</div>
           <ResponsiveContainer width="100%" height={200}>

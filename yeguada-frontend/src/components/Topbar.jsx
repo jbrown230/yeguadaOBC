@@ -8,7 +8,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 20px',
+    padding: '0 16px',
     flexShrink: 0,
     borderBottom: '1px solid rgba(255,255,255,0.08)',
   },
@@ -20,6 +20,12 @@ const styles = {
     fontWeight: 600,
     fontSize: 15,
     letterSpacing: '0.01em',
+    minWidth: 0,
+  },
+  brandText: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   logoCircle: {
     width: 32,
@@ -33,12 +39,14 @@ const styles = {
     fontSize: 10,
     fontWeight: 800,
     letterSpacing: '0.02em',
+    flexShrink: 0,
   },
   right: {
     display: 'flex',
     alignItems: 'center',
-    gap: 14,
+    gap: 10,
     color: '#fff',
+    flexShrink: 0,
   },
   notifBtn: {
     position: 'relative',
@@ -79,11 +87,13 @@ const styles = {
     fontSize: 11,
     fontWeight: 700,
     color: '#fff',
+    flexShrink: 0,
   },
   adminLabel: {
     fontSize: 12,
     opacity: 0.8,
     cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
   statusPill: {
     display: 'flex',
@@ -91,6 +101,7 @@ const styles = {
     gap: 5,
     fontSize: 11,
     opacity: 0.75,
+    whiteSpace: 'nowrap',
   },
   dot: (online) => ({
     width: 6,
@@ -98,30 +109,56 @@ const styles = {
     borderRadius: '50%',
     background: online ? '#5DCAA5' : '#E24B4A',
     animation: online ? 'pulse 2s infinite' : 'none',
+    flexShrink: 0,
   }),
+  iconBtn: {
+    background: 'none',
+    border: 'none',
+    color: '#fff',
+    fontSize: 20,
+    padding: '4px 6px',
+    cursor: 'pointer',
+    lineHeight: 1,
+    opacity: 0.9,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chatBtnLabel: {
+    fontSize: 12,
+    fontWeight: 600,
+    letterSpacing: '0.02em',
+  },
 };
 
-export default function Topbar({ backendOnline }) {
+export default function Topbar({ backendOnline, onMenuToggle, onChatToggle }) {
   return (
     <header style={styles.bar}>
       <div style={styles.brand}>
+        <button className="btn-menu" style={styles.iconBtn} onClick={onMenuToggle} aria-label="Abrir menú">
+          ☰
+        </button>
         <div style={styles.logoCircle}>LY</div>
-        Ecoturismo La Yeguada OBC
+        <span style={styles.brandText}>Ecoturismo La Yeguada OBC</span>
       </div>
 
       <div style={styles.right}>
-        <div style={styles.statusPill}>
+        <div className="topbar-status" style={styles.statusPill}>
           <div style={styles.dot(backendOnline)} />
           {backendOnline ? 'Backend conectado' : 'Modo demo'}
         </div>
 
-        <button style={styles.notifBtn}>
+        <button className="topbar-notif" style={styles.notifBtn}>
           ◌
           <span style={styles.badge}>1</span>
         </button>
 
         <div style={styles.avatar}>AD</div>
-        <span style={styles.adminLabel}>Administrador ▾</span>
+        <span className="topbar-admin" style={styles.adminLabel}>Administrador ▾</span>
+
+        <button className="btn-chat" style={styles.iconBtn} onClick={onChatToggle} aria-label="Abrir chat">
+          <span style={styles.chatBtnLabel}>Chat</span>
+        </button>
       </div>
     </header>
   );

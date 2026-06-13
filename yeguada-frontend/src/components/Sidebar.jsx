@@ -10,15 +10,6 @@ const navItems = [
 ];
 
 const styles = {
-  sidebar: {
-    width: 'var(--sidebar-width)',
-    background: 'var(--card)',
-    borderRight: '0.5px solid var(--border)',
-    display: 'flex',
-    flexDirection: 'column',
-    flexShrink: 0,
-    overflowY: 'auto',
-  },
   logoArea: {
     padding: '20px 16px 16px',
     borderBottom: '0.5px solid var(--border)',
@@ -78,11 +69,25 @@ const styles = {
     color: 'var(--stone-mid)',
     textAlign: 'center',
   },
+  closeBtn: {
+    background: 'none',
+    border: '0.5px solid var(--border)',
+    borderRadius: 'var(--r-sm)',
+    padding: '3px 9px',
+    color: 'var(--stone)',
+    fontSize: 13,
+    cursor: 'pointer',
+    lineHeight: 1.4,
+  },
 };
 
-export default function Sidebar({ activePage, onNavigate }) {
+export default function Sidebar({ activePage, onNavigate, isOpen, onClose }) {
   return (
-    <aside style={styles.sidebar}>
+    <aside className={`sidebar-root${isOpen ? ' open' : ''}`}>
+      <div className="sidebar-close-row">
+        <button style={styles.closeBtn} onClick={onClose}>✕</button>
+      </div>
+
       <div style={styles.logoArea}>
         <div style={styles.logoEmoji}>LY</div>
         <div style={styles.orgName}>La Yeguada OBC<br />· Chatbot Admin ·</div>

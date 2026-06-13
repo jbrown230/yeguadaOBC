@@ -64,7 +64,7 @@ const INITIAL_MSG = {
 };
 
 const s = {
-  panel: { width: 'var(--chat-width)', background: 'var(--card)', borderLeft: '0.5px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 },
+  panel: {},
   header: { padding: '12px 16px', borderBottom: '0.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   headerLeft: { display: 'flex', alignItems: 'center', gap: 10 },
   botAvatar: { width: 38, height: 38, borderRadius: '50%', background: 'var(--forest-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: 'var(--forest)', letterSpacing: '0.02em', border: '1.5px solid var(--forest-light)', flexShrink: 0 },
@@ -89,7 +89,7 @@ const s = {
   sendBtn: { width: 32, height: 32, background: 'var(--forest)', color: '#fff', border: 'none', borderRadius: 'var(--r-sm)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, transition: 'background 0.15s' },
 };
 
-const ChatPanel = React.memo(function ChatPanel({ backendOnline }) {
+const ChatPanel = React.memo(function ChatPanel({ backendOnline, isOpen, onClose }) {
   // Inicializar desde localStorage — persiste al recargar
   const [messages, setMessages] = useState(() => loadHistory() || [INITIAL_MSG]);
   const [input, setInput]   = useState('');
@@ -186,7 +186,10 @@ const ChatPanel = React.memo(function ChatPanel({ backendOnline }) {
   }
 
   return (
-    <aside style={s.panel}>
+    <aside className={`chat-root${isOpen ? ' open' : ''}`}>
+      <div className="chat-close-row">
+        <button style={s.clearBtn} onClick={onClose}>✕</button>
+      </div>
       <div style={s.header}>
         <div style={s.headerLeft}>
           <div style={s.botAvatar}>LY</div>

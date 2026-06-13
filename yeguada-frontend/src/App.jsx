@@ -10,8 +10,6 @@ import Monitor from './pages/Monitor';
 import Config from './pages/Config';
 import { useMetrics } from './hooks/useMetrics';
 
-// Memoizado: solo re-renderiza si cambia activePage o metrics
-// El ChatPanel está FUERA, así que nunca se re-renderiza por métricas ni navegación
 const MainContent = memo(function MainContent({
   activePage, metrics, backendOnline, loading, lastUpdated,
 }) {
@@ -27,7 +25,7 @@ const MainContent = memo(function MainContent({
   };
 
   return (
-    <main style={{ flex: 1, overflowY: 'auto', padding: '20px', background: 'var(--bg)' }}>
+    <main className="app-main">
       {loading ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50%', flexDirection: 'column', gap: 12 }}>
           <div style={{ width: 32, height: 32, border: '3px solid var(--border)', borderTop: '3px solid var(--forest-light)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
@@ -44,17 +42,38 @@ const MainContent = memo(function MainContent({
 });
 
 export default function App() {
-  const [activePage, setActivePage] = useState('dashboard');
+  const [activePage, setActivePage]   = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [chatOpen, setChatOpen]       = useState(false);
   const { metrics, backendOnline, loading, lastUpdated } = useMetrics(30000);
 
-  // Referencia estable: no se recrea en cada poll de métricas
-  const handleNavigate = useCallback((page) => setActivePage(page), []);
+  const handleNavigate = useCallback((page) => {
+    setActivePage(page);
+    setSidebarOpen(false);
+  }, []);
+
+  const closeAll = useCallback(() => {
+    setSidebarOpen(false);
+    setChatOpen(false);
+  }, []);
+
+  const anyOpen = sidebarOpen || chatOpen;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      <Topbar backendOnline={backendOnline} />
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <Sidebar activePage={activePage} onNavigate={handleNavigate} />
+    <div className="app-root">
+      <Topbar
+        backendOnline={backendOnline}
+        onMenuToggle={() => setSidebarOpen(o => !o)}
+        onChatToggle={() => setChatOpen(o => !o)}
+      />
+      <div className="app-body">
+        {anyOpen && <div className="drawer-overlay active" onClick={closeAll} />}
+        <Sidebar
+          activePage={activePage}
+          onNavigate={handleNavigate}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
         <MainContent
           activePage={activePage}
           metrics={metrics}
@@ -62,8 +81,11 @@ export default function App() {
           loading={loading}
           lastUpdated={lastUpdated}
         />
-        {/* ChatPanel al mismo nivel — React.memo lo protege de re-renders de MainContent */}
-        <ChatPanel backendOnline={backendOnline} />
+        <ChatPanel
+          backendOnline={backendOnline}
+          isOpen={chatOpen}
+          onClose={() => setChatOpen(false)}
+        />
       </div>
     </div>
   );

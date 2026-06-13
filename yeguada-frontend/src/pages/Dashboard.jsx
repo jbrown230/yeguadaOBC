@@ -76,7 +76,7 @@ export default function Dashboard({ metrics }) {
       </h1>
 
       {/* KPI Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+      <div className="kpi-grid-4">
         <KpiCard label="Total de Chats Hoy" value={metrics.totalChatsToday} sub="↑ 12% vs ayer" color="green" style={{ animationDelay: '0.05s' }} />
         <KpiCard label="Tasa de Resolución" value={`${metrics.resolutionRate}%`} sub="↑ 3% esta semana" color="teal" style={{ animationDelay: '0.1s' }} />
         <KpiCard label="Escalados a Humano" value={`${metrics.escalationRate}%`} sub="↓ 1% vs semana pasada" color="gold" style={{ animationDelay: '0.15s' }} />
@@ -84,7 +84,7 @@ export default function Dashboard({ metrics }) {
       </div>
 
       {/* Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 12, marginBottom: 16 }}>
+      <div className="chart-row">
         {/* Line Chart */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>

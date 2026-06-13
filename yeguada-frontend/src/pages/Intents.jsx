@@ -69,7 +69,7 @@ export default function Intents() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+      <div className="intent-grid">
         {intents.map((intent, i) => {
           const color = COLOR_MAP[COLORS[i % COLORS.length]];
           const count = COUNTS[intent.id] || Math.floor(Math.random() * 20 + 5);
