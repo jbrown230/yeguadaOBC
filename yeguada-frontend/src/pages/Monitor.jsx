@@ -49,9 +49,9 @@ export default function Monitor(props) {
         <div className="panel panel-pad">
           <div className="panel-title" style={{ marginBottom: 14 }}>Métricas de Rendimiento</div>
           {[
-            { label: 'Tasa de resolución', value: resolutionRate, color: 'var(--accent)', unit: '%' },
+            { label: 'Tasa de resolución', value: resolutionRate, color: 'var(--accent)', unit: `${resolutionRate}%` },
             { label: 'Tiempo de respuesta', value: Math.min(avgResponseTimeMs / 50, 100), color: 'var(--warning)', unit: `${(avgResponseTimeMs / 1000).toFixed(1)}s` },
-            { label: 'Tasa de escalamiento', value: escalationRate, color: 'var(--danger)', unit: '%' },
+            { label: 'Tasa de escalamiento', value: escalationRate, color: 'var(--danger)', unit: `${escalationRate}%` },
           ].map(m => (
             <div key={m.label} style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -59,7 +59,7 @@ export default function Monitor(props) {
                 <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>{m.unit}</span>
               </div>
               <div className="progress-track" style={{ height: 6 }}>
-                <div className="progress-fill" style={{ width: `${m.value}%`, background: m.color }} />
+                <div className="progress-fill" style={{ '--fill': m.value / 100, background: m.color }} />
               </div>
             </div>
           ))}

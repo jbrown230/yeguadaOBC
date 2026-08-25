@@ -83,7 +83,7 @@ export default function Intents() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                   <span style={{ fontSize: 10.5, color: 'var(--text-ter)', width: 60, flexShrink: 0 }}>Precisión</span>
                   <div className="progress-track" style={{ flex: 1 }}>
-                    <div className="progress-fill" style={{ width: `${accuracy}%`, background: 'var(--accent)' }} />
+                    <div className="progress-fill" style={{ '--fill': accuracy / 100, background: 'var(--accent)' }} />
                   </div>
                   <span className="mono" style={{ fontSize: 11, color: 'var(--text-sec)' }}>{accuracy}%</span>
                 </div>

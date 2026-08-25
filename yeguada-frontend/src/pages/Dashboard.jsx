@@ -147,7 +147,7 @@ export default function Dashboard({ metrics }) {
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div className="progress-track" style={{ maxWidth: 60, flex: 1 }}>
-                          <div className="progress-fill" style={{ width: `${Math.round((c.score || 0) * 100)}%`, background: c.score >= 0.7 ? 'var(--accent)' : 'var(--warning)' }} />
+                          <div className="progress-fill" style={{ '--fill': c.score || 0, background: c.score >= 0.7 ? 'var(--accent)' : 'var(--warning)' }} />
                         </div>
                         <span className="mono" style={{ fontSize: 11, color: 'var(--text-sec)' }}>{Math.round((c.score || 0) * 100)}%</span>
                       </div>
