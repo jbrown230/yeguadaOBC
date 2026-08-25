@@ -1,0 +1,16 @@
+{
+  "name": "ecoturismo-la-yeguada-obc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo: backend NLP + dashboard frontend — Ecoturismo La Yeguada OBC (TFG UNA)",
+  "scripts": {
+    "install:all": "npm install --prefix yeguada-backend && npm install --prefix yeguada-frontend",
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev --prefix yeguada-backend\" \"npm start --prefix yeguada-frontend\"",
+    "start": "concurrently -n backend,frontend -c blue,green \"npm start --prefix yeguada-backend\" \"npm start --prefix yeguada-frontend\"",
+    "backend": "npm run dev --prefix yeguada-backend",
+    "frontend": "npm start --prefix yeguada-frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
