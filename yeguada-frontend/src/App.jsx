@@ -27,13 +27,13 @@ const MainContent = memo(function MainContent({
   return (
     <main className="app-main">
       {loading ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50%', flexDirection: 'column', gap: 12 }}>
-          <div style={{ width: 32, height: 32, border: '3px solid var(--border)', borderTop: '3px solid var(--forest-light)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-          <span style={{ fontSize: 13, color: 'var(--stone-mid)' }}>Cargando dashboard...</span>
+        <div className="loading-state">
+          <div className="spinner" />
+          <span style={{ fontSize: 13, color: 'var(--text-sec)' }}>Cargando dashboard...</span>
         </div>
       ) : renderPage()}
       {lastUpdated && (
-        <div style={{ fontSize: 10, color: 'var(--stone-mid)', textAlign: 'right', marginTop: 16, paddingBottom: 8 }}>
+        <div className="last-updated">
           Última actualización: {lastUpdated}
         </div>
       )}

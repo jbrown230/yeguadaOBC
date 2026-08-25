@@ -23,31 +23,7 @@ const MONTH_DATA = [
   { day: 'Sem 4', chatbot: 640, humano: 150 },
 ];
 
-const STATUS_MAP = {
-  true:  { label: 'Resuelto por Chatbot', cls: 'resolved' },
-  false: { label: 'Escalado a Humano',    cls: 'escalated' },
-};
-
-const PIE_COLORS = ['#3E6B20', '#1D9E75', '#EF9F27', '#888780', '#D85A30', '#3B8BD4'];
-
-const cardStyle = {
-  background: 'var(--card)',
-  border: '0.5px solid var(--border)',
-  borderRadius: 'var(--r-lg)',
-  padding: 16,
-};
-
-const badgeStyle = (resolved) => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 5,
-  fontSize: 11,
-  fontWeight: 600,
-  padding: '3px 10px',
-  borderRadius: 'var(--r-full)',
-  background: resolved ? 'var(--teal-pale)' : 'var(--coral-pale)',
-  color: resolved ? 'var(--teal)' : 'var(--coral)',
-});
+const PIE_COLORS = ['#1B6B47', '#5C8F78', '#8A5A12', '#7B8190', '#A3312A', '#454A54'];
 
 export default function Dashboard({ metrics }) {
   const [range, setRange] = useState('week');
@@ -70,127 +46,119 @@ export default function Dashboard({ metrics }) {
   const avgSec = (metrics.avgResponseTimeMs / 1000).toFixed(1);
 
   return (
-    <div style={{ animation: 'fadeUp 0.3s var(--ease)' }}>
-      <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>
-        Panel de Control de Rendimiento
-      </h1>
+    <div className="page-enter">
+      <div className="page-head">
+        <div>
+          <h1 className="page-title">Panel de Control</h1>
+          <div className="page-sub">Rendimiento del chatbot en tiempo real</div>
+        </div>
+      </div>
 
-      {/* KPI Row */}
-      <div className="kpi-grid-4">
-        <KpiCard label="Total de Chats Hoy" value={metrics.totalChatsToday} sub="↑ 12% vs ayer" color="green" style={{ animationDelay: '0.05s' }} />
-        <KpiCard label="Tasa de Resolución" value={`${metrics.resolutionRate}%`} sub="↑ 3% esta semana" color="teal" style={{ animationDelay: '0.1s' }} />
-        <KpiCard label="Escalados a Humano" value={`${metrics.escalationRate}%`} sub="↓ 1% vs semana pasada" color="gold" style={{ animationDelay: '0.15s' }} />
-        <KpiCard label="Tiempo Prom. Respuesta" value={`${avgSec}s`} sub="node-nlp local" color="stone" style={{ animationDelay: '0.2s' }} />
+      {/* Stat strip */}
+      <div className="stat-strip">
+        <KpiCard label="Total de Chats Hoy" value={metrics.totalChatsToday} sub="↑ 12% vs ayer" />
+        <KpiCard label="Tasa de Resolución" value={`${metrics.resolutionRate}%`} sub="↑ 3% esta semana" />
+        <KpiCard label="Escalados a Humano" value={`${metrics.escalationRate}%`} sub="↓ 1% vs semana pasada" />
+        <KpiCard label="Tiempo Prom. Respuesta" value={`${avgSec}s`} sub="node-nlp local" />
       </div>
 
       {/* Charts Row */}
       <div className="chart-row">
         {/* Line Chart */}
-        <div style={cardStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span style={{ fontSize: 13, fontWeight: 700 }}>Daily Chat Volume (Chatbot vs. Humano)</span>
-            <div style={{ display: 'flex', gap: 6 }}>
+        <div className="panel panel-pad">
+          <div className="panel-head">
+            <span className="panel-title">Volumen de Chats — Chatbot vs. Humano</span>
+            <div className="segmented">
               {['week', 'month'].map(r => (
-                <button key={r} onClick={() => setRange(r)} style={{
-                  fontSize: 11, fontWeight: 600, padding: '3px 10px',
-                  borderRadius: 'var(--r-full)',
-                  border: '0.5px solid var(--border)',
-                  cursor: 'pointer',
-                  background: range === r ? 'var(--forest-pale)' : 'transparent',
-                  color: range === r ? 'var(--forest)' : 'var(--stone)',
-                  transition: 'all 0.15s',
-                }}>
-                  {r === 'week' ? 'Last Week' : 'This Month'}
+                <button key={r} className={range === r ? 'active' : ''} onClick={() => setRange(r)}>
+                  {r === 'week' ? 'Última semana' : 'Este mes'}
                 </button>
               ))}
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 16, marginBottom: 10 }}>
-            {[{ label: 'Chatbot', color: '#3E6B20' }, { label: 'Humano', color: '#1D9E75' }].map(l => (
-              <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--stone)' }}>
-                <div style={{ width: 12, height: 3, borderRadius: 2, background: l.color }} />
+          <div className="legend-row">
+            {[{ label: 'Chatbot', color: '#1B6B47' }, { label: 'Humano', color: '#9CA2AF' }].map(l => (
+              <div key={l.label} className="legend-item">
+                <span className="legend-swatch" style={{ background: l.color }} />
                 {l.label}
               </div>
             ))}
           </div>
 
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" height={170}>
             <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
-              <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'var(--stone-mid)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'var(--stone-mid)' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: '0.5px solid var(--border)', boxShadow: 'var(--shadow-sm)' }} />
-              <Line type="monotone" dataKey="chatbot" stroke="#3E6B20" strokeWidth={2} dot={{ r: 3, fill: '#3E6B20' }} activeDot={{ r: 5 }} />
-              <Line type="monotone" dataKey="humano" stroke="#1D9E75" strokeWidth={2} dot={{ r: 3, fill: '#1D9E75' }} activeDot={{ r: 5 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-100)" vertical={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 10.5, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10.5, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ fontSize: 11.5, borderRadius: 8, border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', fontFamily: 'var(--font-sans)' }} />
+              <Line type="monotone" dataKey="chatbot" stroke="#1B6B47" strokeWidth={2} dot={{ r: 3, fill: '#1B6B47', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+              <Line type="monotone" dataKey="humano" stroke="#9CA2AF" strokeWidth={2} dot={{ r: 3, fill: '#9CA2AF', strokeWidth: 0 }} activeDot={{ r: 5 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         {/* Pie Chart */}
-        <div style={cardStyle}>
-          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Principales Intenciones</div>
-          <ResponsiveContainer width="100%" height={180}>
+        <div className="panel panel-pad">
+          <div className="panel-title" style={{ marginBottom: 12 }}>Principales Intenciones</div>
+          <ResponsiveContainer width="100%" height={190}>
             <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" innerRadius={48} outerRadius={72} dataKey="value" paddingAngle={2}>
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={48} outerRadius={72} dataKey="value" paddingAngle={2} stroke="var(--surface)" strokeWidth={2}>
                 {pieData.map((_, i) => (
                   <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                 ))}
               </Pie>
-              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-              <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: '0.5px solid var(--border)' }} />
+              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10.5, fontFamily: 'var(--font-sans)' }} />
+              <Tooltip contentStyle={{ fontSize: 11.5, borderRadius: 8, border: '1px solid var(--border)', fontFamily: 'var(--font-sans)' }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Conversations Table */}
-      <div style={cardStyle}>
-        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Conversaciones Recientes</div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+      <div className="panel panel-pad">
+        <div className="panel-title" style={{ marginBottom: 12 }}>Conversaciones Recientes</div>
+        <div className="table-wrap">
+          <table className="table">
             <thead>
               <tr>
                 {['Usuario', 'Inicio', 'Intención', 'Score NLP', 'Estado', 'Acciones'].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '6px 12px', fontSize: 10, fontWeight: 700, color: 'var(--stone-mid)', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '0.5px solid var(--border)', whiteSpace: 'nowrap' }}>{h}</th>
+                  <th key={h}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
+              {metrics.recentConversations.length === 0 && (
+                <tr><td colSpan={6}><div className="empty-state">Sin conversaciones registradas todavía.</div></td></tr>
+              )}
               {metrics.recentConversations.map((c, i) => {
                 const initials = (c.sessionId || 'U').slice(0, 2).toUpperCase();
                 const time = new Date(c.time).toLocaleString('es', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
                 return (
-                  <tr key={i} style={{ borderBottom: '0.5px solid rgba(44,44,42,0.05)' }}>
-                    <td style={{ padding: '10px 12px' }}>
+                  <tr key={i}>
+                    <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--forest-pale)', color: 'var(--forest)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{initials}</div>
-                        <span style={{ color: 'var(--stone-deep)' }}>{c.sessionId}</span>
+                        <div className="row-avatar">{initials}</div>
+                        <span style={{ color: 'var(--text)' }}>{c.sessionId}</span>
                       </div>
                     </td>
-                    <td style={{ padding: '10px 12px', color: 'var(--stone-mid)', whiteSpace: 'nowrap' }}>{time}</td>
-                    <td style={{ padding: '10px 12px' }}>
-                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: 'var(--forest-pale)', color: 'var(--forest)', fontWeight: 600 }}>
-                        {c.intent || '—'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '10px 12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ flex: 1, height: 4, background: 'var(--stone-pale)', borderRadius: 2, maxWidth: 60 }}>
-                          <div style={{ width: `${Math.round((c.score || 0) * 100)}%`, height: '100%', background: c.score >= 0.7 ? 'var(--teal-light)' : 'var(--gold-light)', borderRadius: 2 }} />
+                    <td className="mono" style={{ color: 'var(--text-sec)', whiteSpace: 'nowrap' }}>{time}</td>
+                    <td><span className="tag tag-accent">{c.intent || '—'}</span></td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div className="progress-track" style={{ maxWidth: 60, flex: 1 }}>
+                          <div className="progress-fill" style={{ width: `${Math.round((c.score || 0) * 100)}%`, background: c.score >= 0.7 ? 'var(--accent)' : 'var(--warning)' }} />
                         </div>
-                        <span style={{ fontSize: 11, color: 'var(--stone)' }}>{Math.round((c.score || 0) * 100)}%</span>
+                        <span className="mono" style={{ fontSize: 11, color: 'var(--text-sec)' }}>{Math.round((c.score || 0) * 100)}%</span>
                       </div>
                     </td>
-                    <td style={{ padding: '10px 12px' }}>
-                      <span style={badgeStyle(c.resolved)}>
+                    <td>
+                      <span className={`status-badge ${c.resolved ? 'resolved' : 'escalated'}`}>
                         {c.resolved ? 'Chatbot' : 'Humano'}
                       </span>
                     </td>
-                    <td style={{ padding: '10px 12px' }}>
-                      <button style={{ background: 'none', border: 'none', color: 'var(--forest)', fontWeight: 600, fontSize: 11, cursor: 'pointer', textDecoration: 'underline' }}>
-                        Ver Detalles
-                      </button>
+                    <td>
+                      <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px' }}>Ver detalles</button>
                     </td>
                   </tr>
                 );
