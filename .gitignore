@@ -27,3 +27,8 @@ Thumbs.db
 *.ntvs*
 *.njsproj
 *.sln
+
+# Claude Code (tooling/skills installed locally, not project source)
+.claude/
+.impeccable/
+CLAUDE.local.md

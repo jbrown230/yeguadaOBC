@@ -1,6 +1,7 @@
 // components/ChatPanel.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { sendMessage, recordLocalConversation, resetBackendMetrics } from '../services/api';
+import Icon from './Icon';
 
 const LS_KEY = 'yeguada_chat_history';
 
@@ -61,32 +62,6 @@ const INITIAL_MSG = {
   text: '¡Hola! Soy el asistente virtual de Ecoturismo La Yeguada OBC. ¿En qué puedo ayudarte hoy?',
   time: now(),
   intent: null,
-};
-
-const s = {
-  panel: {},
-  header: { padding: '12px 16px', borderBottom: '0.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  headerLeft: { display: 'flex', alignItems: 'center', gap: 10 },
-  botAvatar: { width: 38, height: 38, borderRadius: '50%', background: 'var(--forest-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: 'var(--forest)', letterSpacing: '0.02em', border: '1.5px solid var(--forest-light)', flexShrink: 0 },
-  botName: { fontSize: 13, fontWeight: 700, color: 'var(--stone-deep)' },
-  botStatus: { fontSize: 11, color: 'var(--teal-light)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 },
-  statusDot: { width: 6, height: 6, borderRadius: '50%', background: 'var(--teal-light)', animation: 'pulse 2s infinite' },
-  clearBtn: { fontSize: 10, color: 'var(--stone-mid)', background: 'none', border: '0.5px solid var(--border)', borderRadius: 4, padding: '3px 7px', cursor: 'pointer' },
-  msgs: { flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: 10 },
-  msg: (role) => ({
-    maxWidth: '85%', padding: '9px 12px', borderRadius: 12, fontSize: 12,
-    lineHeight: 1.55, whiteSpace: 'pre-wrap', animation: 'fadeUp 0.2s var(--ease)',
-    ...(role === 'bot'
-      ? { background: 'var(--forest-pale)', color: 'var(--stone-deep)', alignSelf: 'flex-start', borderBottomLeftRadius: 3 }
-      : { background: 'var(--forest)', color: '#fff', alignSelf: 'flex-end', borderBottomRightRadius: 3 }),
-  }),
-  time: { fontSize: 10, color: 'var(--stone-light)', marginTop: 3 },
-  intentTag: { display: 'inline-block', fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 20, background: 'rgba(45,80,22,0.12)', color: 'var(--forest)', marginTop: 4, letterSpacing: '0.04em' },
-  typing: { display: 'flex', alignItems: 'center', gap: 4, padding: '10px 12px', background: 'var(--forest-pale)', borderRadius: 12, borderBottomLeftRadius: 3, width: 52, alignSelf: 'flex-start' },
-  typingDot: (d) => ({ width: 5, height: 5, borderRadius: '50%', background: 'var(--forest-light)', animation: `bounce 0.9s ${d}s infinite` }),
-  inputRow: { padding: '10px', borderTop: '0.5px solid var(--border)', display: 'flex', gap: 6, alignItems: 'flex-end' },
-  textarea: { flex: 1, border: '0.5px solid var(--border)', borderRadius: 'var(--r-sm)', padding: '8px 10px', fontSize: 12, fontFamily: 'var(--font-sans)', resize: 'none', outline: 'none', background: 'var(--bg)', color: 'var(--stone-deep)', maxHeight: 80, lineHeight: 1.4 },
-  sendBtn: { width: 32, height: 32, background: 'var(--forest)', color: '#fff', border: 'none', borderRadius: 'var(--r-sm)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, transition: 'background 0.15s' },
 };
 
 const ChatPanel = React.memo(function ChatPanel({ backendOnline, isOpen, onClose }) {
@@ -182,61 +157,60 @@ const ChatPanel = React.memo(function ChatPanel({ backendOnline, isOpen, onClose
   function handleInput(e) {
     setInput(e.target.value);
     e.target.style.height = 'auto';
-    e.target.style.height = Math.min(e.target.scrollHeight, 80) + 'px';
+    e.target.style.height = Math.min(e.target.scrollHeight, 84) + 'px';
   }
 
   return (
     <aside className={`chat-root${isOpen ? ' open' : ''}`}>
       <div className="chat-close-row">
-        <button style={s.clearBtn} onClick={onClose}>✕</button>
+        <button className="icon-btn" onClick={onClose} aria-label="Cerrar chat">
+          <Icon name="close" size={16} />
+        </button>
       </div>
-      <div style={s.header}>
-        <div style={s.headerLeft}>
-          <div style={s.botAvatar}>LY</div>
+      <div className="chat-header">
+        <div className="chat-header-left">
+          <div className="chat-avatar">LY</div>
           <div>
-            <div style={s.botName}>La Yeguada Bot</div>
-            <div style={s.botStatus}>
-              <div style={s.statusDot} />
+            <div className="chat-bot-name">La Yeguada Bot</div>
+            <div className="chat-bot-status">
+              <span className="status-dot on" />
               {backendOnline ? 'node-nlp · En línea' : 'Demo local · En línea'}
             </div>
           </div>
         </div>
-        <button style={s.clearBtn} onClick={clearHistory} title="Limpiar historial">Limpiar</button>
+        <button className="btn btn-ghost btn-sm" onClick={clearHistory} title="Limpiar historial">Limpiar</button>
       </div>
 
-      <div style={s.msgs} ref={msgsRef}>
+      <div className="chat-msgs" ref={msgsRef}>
         {messages.map((m, i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: m.role === 'bot' ? 'flex-start' : 'flex-end' }}>
-            <div style={s.msg(m.role)}>{m.text}</div>
-            <div style={s.time}>{m.time}</div>
+          <div key={i} className={`chat-msg-row ${m.role}`}>
+            <div className={`chat-bubble ${m.role}`}>{m.text}</div>
+            <div className="chat-time">{m.time}</div>
             {m.intent && m.intent !== 'unknown' && (
-              <div style={s.intentTag}>{m.intent}</div>
+              <span className="tag tag-accent tag-mono chat-intent-tag">{m.intent}</span>
             )}
           </div>
         ))}
         {typing && (
-          <div style={s.typing}>
-            <div style={s.typingDot(0)} />
-            <div style={s.typingDot(0.15)} />
-            <div style={s.typingDot(0.3)} />
+          <div className="chat-typing">
+            <span /><span /><span />
           </div>
         )}
       </div>
 
-      <div style={s.inputRow}>
+      <div className="chat-input-row">
         <textarea
           ref={taRef}
-          style={s.textarea}
+          className="chat-textarea"
           rows={1}
           value={input}
           onChange={handleInput}
           onKeyDown={handleKey}
           placeholder="Escribe tu consulta..."
         />
-        <button style={s.sendBtn} onClick={send}
-          onMouseEnter={e => e.currentTarget.style.background = 'var(--forest-mid)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'var(--forest)'}
-        >➤</button>
+        <button className="chat-send-btn" onClick={send} disabled={!input.trim()} aria-label="Enviar mensaje">
+          <Icon name="send" size={15} />
+        </button>
       </div>
     </aside>
   );
