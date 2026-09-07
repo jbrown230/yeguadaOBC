@@ -23,7 +23,7 @@ const MONTH_DATA = [
   { day: 'Sem 4', chatbot: 640, humano: 150 },
 ];
 
-const PIE_COLORS = ['#1B6B47', '#5C8F78', '#8A5A12', '#7B8190', '#A3312A', '#454A54'];
+const PIE_COLORS = ['#396B2C', '#FFA700', '#8A5A12', '#7B8190', '#A3312A', '#454A54'];
 
 export default function Dashboard({ metrics }) {
   const [range, setRange] = useState('week');
@@ -78,7 +78,7 @@ export default function Dashboard({ metrics }) {
           </div>
 
           <div className="legend-row">
-            {[{ label: 'Chatbot', color: '#1B6B47' }, { label: 'Humano', color: '#9CA2AF' }].map(l => (
+            {[{ label: 'Chatbot', color: '#396B2C' }, { label: 'Humano', color: '#9CA2AF' }].map(l => (
               <div key={l.label} className="legend-item">
                 <span className="legend-swatch" style={{ background: l.color }} />
                 {l.label}
@@ -92,7 +92,7 @@ export default function Dashboard({ metrics }) {
               <XAxis dataKey="day" tick={{ fontSize: 10.5, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10.5, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ fontSize: 11.5, borderRadius: 8, border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', fontFamily: 'var(--font-sans)' }} />
-              <Line type="monotone" dataKey="chatbot" stroke="#1B6B47" strokeWidth={2} dot={{ r: 3, fill: '#1B6B47', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+              <Line type="monotone" dataKey="chatbot" stroke="#396B2C" strokeWidth={2} dot={{ r: 3, fill: '#396B2C', strokeWidth: 0 }} activeDot={{ r: 5 }} />
               <Line type="monotone" dataKey="humano" stroke="#9CA2AF" strokeWidth={2} dot={{ r: 3, fill: '#9CA2AF', strokeWidth: 0 }} activeDot={{ r: 5 }} />
             </LineChart>
           </ResponsiveContainer>
