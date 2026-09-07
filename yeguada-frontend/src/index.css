@@ -194,8 +194,8 @@ a { color: var(--accent); }
 .topbar-mark {
   width: 28px; height: 28px;
   border-radius: var(--r-sm);
-  background: var(--accent-strong);
-  color: var(--white);
+  background: var(--gold);
+  color: var(--accent-strong);
   display: flex; align-items: center; justify-content: center;
   font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.01em;
   flex-shrink: 0;
@@ -317,8 +317,8 @@ a { color: var(--accent); }
   white-space: nowrap;
 }
 .btn:disabled { opacity: 0.5; cursor: default; }
-.btn-primary { background: var(--accent-strong); color: var(--white); }
-.btn-primary:hover:not(:disabled) { background: var(--accent); }
+.btn-primary { background: var(--accent-strong); color: var(--white); border-color: var(--gold); }
+.btn-primary:hover:not(:disabled) { background: var(--accent); border-color: var(--gold); }
 .btn-primary.is-success { background: var(--accent); }
 .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
 .btn-secondary:hover:not(:disabled) { background: var(--gray-50); border-color: var(--gray-300); }
@@ -509,7 +509,7 @@ input[type="range"] { accent-color: var(--accent); width: 100%; }
 .chat-header-left { display: flex; align-items: center; gap: 10px; }
 .chat-avatar {
   width: 34px; height: 34px; border-radius: var(--r-sm);
-  background: var(--accent-strong); color: var(--white);
+  background: var(--gold); color: var(--accent-strong);
   display: flex; align-items: center; justify-content: center;
   font-size: var(--fs-2xs); font-weight: 700; flex-shrink: 0;
 }
