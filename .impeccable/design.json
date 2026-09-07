@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-24T20:30:00Z",
+  "title": "Design System: La Yeguada OBC — Chatbot Admin",
+  "extensions": {
+    "colorMeta": {
+      "accent": { "role": "primary", "displayName": "Signature Forest", "canonical": "#1B6B47", "tonalRamp": ["#0B2418", "#0F3521", "#124F35", "#1B6B47", "#2F8A63", "#5CA983", "#9BC9AF", "#E7F2EC"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#15171B", "tonalRamp": ["#0A0B0D", "#15171B", "#21242A", "#33373F", "#454A54", "#7B8190", "#C7CBD3", "#F4F5F6"] },
+      "warning": { "role": "semantic", "displayName": "Amber Escalation", "canonical": "#8A5A12", "tonalRamp": ["#4A2F09", "#6B440D", "#8A5A12", "#B0791E", "#D49B3D", "#E9C079", "#F4DDAF", "#FBF1DE"] },
+      "danger": { "role": "semantic", "displayName": "Brick Danger", "canonical": "#A3312A", "tonalRamp": ["#521815", "#7A241E", "#A3312A", "#C24842", "#D97169", "#E9A19C", "#F3C6C2", "#FBEAE8"] }
+    },
+    "typographyMeta": {
+      "2xs": { "displayName": "Micro Label", "purpose": "Smallest step: stat labels, table headers, timestamps, avatar initials, footer text." },
+      "xs": { "displayName": "Chrome Label", "purpose": "Tags, status badges, field labels, secondary chrome." },
+      "sm": { "displayName": "Dense Secondary", "purpose": "Table cells, chat bubbles, page subtitles." },
+      "base": { "displayName": "UI Body", "purpose": "Default: buttons, inputs, nav items, panel titles." },
+      "heading": { "displayName": "Page Title", "purpose": "One per page, top-left." },
+      "data": { "displayName": "Measured Figure", "purpose": "Any live-changing number: counts, percentages, scores, timestamps." }
+    },
+    "shadows": [
+      { "name": "xs", "value": "0 1px 2px rgba(15,17,20,0.04)", "purpose": "Segmented-control active pill." },
+      { "name": "sm", "value": "0 1px 3px rgba(15,17,20,0.06), 0 1px 2px rgba(15,17,20,0.04)", "purpose": "Chart tooltip surfaces." },
+      { "name": "md", "value": "0 8px 24px rgba(15,17,20,0.10), 0 2px 6px rgba(15,17,20,0.06)", "purpose": "Mobile sidebar/chat drawers when floating over content." },
+      { "name": "focus", "value": "0 0 0 3px rgba(27,107,71,0.16)", "purpose": "Focus ring on inputs, tinted from the accent." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default easing for state transitions and drawer slides." },
+      { "name": "fade-up", "value": "translateY(6px) -> translateY(0), opacity 0 -> 1, 0.28s", "purpose": "Page-enter and staggered list-item entrance." }
+    ],
+    "breakpoints": [
+      { "name": "chat-drawer", "value": "1100px" },
+      { "name": "sidebar-drawer", "value": "768px" },
+      { "name": "single-column", "value": "480px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled default action button.",
+      "html": "<button class=\"ds-btn-primary\">Guardar Cambios</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 6px; font-family: Inter, sans-serif; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 1px solid transparent; background: #15171B; color: #fff; transition: background 0.12s cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover { background: #21242A; } .ds-btn-primary:focus-visible { outline: 2px solid #1B6B47; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Bordered neutral button for cancel/secondary actions.",
+      "html": "<button class=\"ds-btn-secondary\">Cancelar</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; gap: 6px; font-family: Inter, sans-serif; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 1px solid #C7CBD3; background: #fff; color: #15171B; transition: background 0.12s, border-color 0.12s; } .ds-btn-secondary:hover { background: #F4F5F6; border-color: #9CA2AF; }"
+    },
+    {
+      "name": "Stat Cell",
+      "kind": "custom",
+      "refersTo": "stat-cell",
+      "description": "One cell of the signature stat-strip: label, mono value, trend.",
+      "html": "<div class=\"ds-stat-cell\"><div class=\"ds-stat-label\">Tasa de Resolución</div><div class=\"ds-stat-value\">94%</div><div class=\"ds-stat-sub\">↑ 3% esta semana</div></div>",
+      "css": ".ds-stat-cell { padding: 16px 20px; border-left: 1px solid #DDE0E5; font-family: Inter, sans-serif; } .ds-stat-label { font-size: 10.5px; font-weight: 600; color: #7B8190; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; } .ds-stat-value { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; font-size: 25px; font-weight: 600; color: #15171B; letter-spacing: -0.02em; margin-bottom: 6px; } .ds-stat-sub { font-size: 11.5px; color: #1B6B47; }"
+    },
+    {
+      "name": "Accent Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Small mono-labeled chip for intent IDs and status labels.",
+      "html": "<span class=\"ds-tag-accent\">booking.tour</span>",
+      "css": ".ds-tag-accent { display: inline-flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; background: #E7F2EC; color: #124F35; }"
+    },
+    {
+      "name": "Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Sidebar navigation item, active state.",
+      "html": "<button class=\"ds-nav-item ds-nav-item--active\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\"><rect x=\"3.5\" y=\"3.5\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"13.5\" y=\"3.5\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"3.5\" y=\"13.5\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"13.5\" y=\"13.5\" width=\"7\" height=\"7\" rx=\"1.5\"/></svg>Panel de Control</button>",
+      "css": ".ds-nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; font-family: Inter, sans-serif; font-size: 13px; font-weight: 500; color: #5C6270; background: transparent; border: none; border-radius: 6px; position: relative; width: 100%; text-align: left; } .ds-nav-item--active { background: #E7F2EC; color: #124F35; font-weight: 600; } .ds-nav-item--active::before { content: ''; position: absolute; left: -8px; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; border-radius: 9999px; background: #1B6B47; }"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Flat bordered container used for every card/section on the page.",
+      "html": "<div class=\"ds-panel\"><div class=\"ds-panel-title\">Conversaciones Recientes</div></div>",
+      "css": ".ds-panel { background: #fff; border: 1px solid #DDE0E5; border-radius: 10px; padding: 18px 20px; } .ds-panel-title { font-family: Inter, sans-serif; font-size: 13px; font-weight: 600; color: #15171B; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Instrumentation Panel",
+    "overview": "This dashboard exists so a small, non-technical community organization can trust and operate an AI system they didn't build. The rejected default was the generic AI-dashboard template it started as: a green gradient topbar, circular avatar bubbles, unicode-glyph icons, pill badges on every element, and same-size hero-metric cards with a decorative top accent bar and a faint background emoji.\n\nThe rebuilt system reads instead as calibrated equipment: a single unified stat strip instead of four separate cards, hairline 1px dividers instead of shadows, monospace figures for anything measured, and one committed accent color used sparingly rather than a five-color nature palette scattered across badges. The register is explicitly the one the user asked for — Linear, Stripe, and Vercel's dashboards — translated through La Yeguada's own single accent rather than a generic SaaS blue.",
+    "keyCharacteristics": [
+      "One committed accent (deep forest green) on an otherwise fully neutral, cool-gray system",
+      "Monospace for every measured figure; proportional sans for everything else",
+      "Hairline (1px) structure over shadow — elevation is rare and reserved for overlays",
+      "Small, precise radii (6–10px); never a pill except true status chips",
+      "A unified stat strip replaces the four-identical-KPI-card template"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Only one saturated color exists in this system. If a new state needs a color, reach for a neutral or a semantic (warning/danger) before introducing a second accent hue.", "section": "colors" },
+      { "name": "The Measured-Figure Rule", "body": "Any number that represents a live measurement (a count, a percentage, a score, a duration, a timestamp) is set in the mono face with tabular figures. Static prose numbers stay in the UI face.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "A panel at rest never has a shadow. Shadow only appears on a surface that is temporarily floating above the rest of the page (a drawer, a tooltip).", "section": "elevation" },
+      { "name": "The Six-Step Rule", "body": "Every font-size is one of six scale steps (2xs/xs/sm/base/heading/data). A one-off literal size is a bug, not a variant — snap it to the nearest step or add a new named step, never both an old and a near-duplicate new value.", "section": "typography" }
+    ],
+    "dos": [
+      "Do set every live-measured number in JetBrains Mono with tabular figures.",
+      "Do use hairline 1px borders as the default structural device; reach for shadow only on genuinely floating surfaces.",
+      "Do keep the accent to a small minority of any screen — active state, primary action, resolved status, one chart series.",
+      "Do author icons as single-stroke SVG at a consistent 1.75px weight; never fall back to emoji or unicode glyphs.",
+      "Do use the stat-strip pattern (bordered row + internal dividers) for any new grouped-metrics display, not a grid of separate cards."
+    ],
+    "donts": [
+      "Don't introduce a second saturated accent color; route new states through the neutral scale or the warning/danger semantics.",
+      "Don't use a full pill radius on anything except true status chips and the segmented control.",
+      "Don't add a decorative top accent bar, background icon glyph, or gradient fill to a card.",
+      "Don't animate width/height/padding/margin for data-driven bars — animate transform: scaleX() from a transform-origin instead.",
+      "Don't use a colored border-left above 1px as a generic emphasis device."
+    ]
+  }
+}

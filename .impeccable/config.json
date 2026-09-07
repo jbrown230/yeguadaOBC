@@ -1,0 +1,15 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-08-25T02:26:03.706Z",
+        "reason": "Operate-mode canon choice, not literally user-named: user confirmed (2026-08-24) wanting the dashboard to sit alongside Linear/Stripe/Vercel; Inter is the standard execution of that register for a workhorse Operate UI (new-work.md exempts Operate/Read from the overused-face ban) and is recorded as a standing brand preference in PRODUCT.md."
+      }
+    ]
+  }
+}
