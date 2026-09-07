@@ -1,124 +1,46 @@
 // components/Sidebar.jsx
 import React from 'react';
+import Icon from './Icon';
 
 const navItems = [
-  { id: 'dashboard', label: 'Panel de Control',          icon: '▦' },
-  { id: 'intents',   label: 'Gestión de Intenciones',    icon: '◎' },
-  { id: 'kb',        label: 'Base de Conocimiento',      icon: '≡' },
-  { id: 'monitor',   label: 'Monitoreo',                 icon: '□' },
-  { id: 'config',    label: 'Configuración',             icon: '◇' },
+  { id: 'dashboard', label: 'Panel de Control',       icon: 'grid' },
+  { id: 'intents',   label: 'Gestión de Intenciones', icon: 'target' },
+  { id: 'kb',        label: 'Base de Conocimiento',   icon: 'book' },
+  { id: 'monitor',   label: 'Monitoreo',               icon: 'activity' },
+  { id: 'config',    label: 'Configuración',           icon: 'settings' },
 ];
-
-const styles = {
-  logoArea: {
-    padding: '20px 16px 16px',
-    borderBottom: '0.5px solid var(--border)',
-    textAlign: 'center',
-  },
-  logoEmoji: {
-    width: 64,
-    height: 64,
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, var(--forest-pale), var(--teal-pale))',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 16,
-    fontWeight: 800,
-    letterSpacing: '0.02em',
-    color: 'var(--forest)',
-    margin: '0 auto 10px',
-    border: '2px solid var(--forest-pale)',
-  },
-  orgName: {
-    fontSize: 11,
-    fontWeight: 700,
-    color: 'var(--forest)',
-    letterSpacing: '0.03em',
-    textTransform: 'uppercase',
-    lineHeight: 1.4,
-  },
-  nav: { flex: 1, padding: '10px 0' },
-  navItem: (active) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: '10px 16px',
-    cursor: 'pointer',
-    fontSize: 13,
-    fontWeight: active ? 600 : 500,
-    color: active ? 'var(--forest)' : 'var(--stone)',
-    background: active ? 'var(--forest-pale)' : 'transparent',
-    borderLeft: `3px solid ${active ? 'var(--forest)' : 'transparent'}`,
-    transition: 'all 0.15s var(--ease)',
-    userSelect: 'none',
-  }),
-  navIcon: {
-    width: 20,
-    height: 20,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 15,
-    flexShrink: 0,
-  },
-  version: {
-    padding: '12px 16px',
-    borderTop: '0.5px solid var(--border)',
-    fontSize: 10,
-    color: 'var(--stone-mid)',
-    textAlign: 'center',
-  },
-  closeBtn: {
-    background: 'none',
-    border: '0.5px solid var(--border)',
-    borderRadius: 'var(--r-sm)',
-    padding: '3px 9px',
-    color: 'var(--stone)',
-    fontSize: 13,
-    cursor: 'pointer',
-    lineHeight: 1.4,
-  },
-};
 
 export default function Sidebar({ activePage, onNavigate, isOpen, onClose }) {
   return (
     <aside className={`sidebar-root${isOpen ? ' open' : ''}`}>
       <div className="sidebar-close-row">
-        <button style={styles.closeBtn} onClick={onClose}>✕</button>
+        <button className="icon-btn" onClick={onClose} aria-label="Cerrar menú">
+          <Icon name="close" size={16} />
+        </button>
       </div>
 
-      <div style={styles.logoArea}>
-        <div style={styles.logoEmoji}>LY</div>
-        <div style={styles.orgName}>La Yeguada OBC<br />· Chatbot Admin ·</div>
+      <div className="sidebar-brand">
+        <div className="sidebar-mark">LY</div>
+        <div>
+          <div className="sidebar-org-name">La Yeguada OBC</div>
+          <div className="sidebar-org-sub">Chatbot Admin</div>
+        </div>
       </div>
 
-      <nav style={styles.nav}>
+      <nav className="nav">
         {navItems.map(item => (
-          <div
+          <button
             key={item.id}
-            style={styles.navItem(activePage === item.id)}
+            className={`nav-item${activePage === item.id ? ' active' : ''}`}
             onClick={() => onNavigate(item.id)}
-            onMouseEnter={e => {
-              if (activePage !== item.id) {
-                e.currentTarget.style.background = 'var(--stone-pale)';
-                e.currentTarget.style.color = 'var(--stone-deep)';
-              }
-            }}
-            onMouseLeave={e => {
-              if (activePage !== item.id) {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = 'var(--stone)';
-              }
-            }}
           >
-            <div style={styles.navIcon}>{item.icon}</div>
+            <Icon name={item.icon} size={17} />
             {item.label}
-          </div>
+          </button>
         ))}
       </nav>
 
-      <div style={styles.version}>
+      <div className="sidebar-foot">
         v1.0.0 · TFG UNA 2024<br />
         node-nlp · WhatsApp API
       </div>
