@@ -39,6 +39,7 @@ app.use(express.json());
       avgResponseTimeMs: Math.round(metrics.totalResponseTimeMs / total),
       intentCounts: metrics.intentCounts,
       recentConversations: metrics.recentConversations,
+      activeNow: db.getActiveSessions(),
     });
   });
 
