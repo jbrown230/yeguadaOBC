@@ -256,6 +256,14 @@ function resetMetrics() {
   db.prepare('DELETE FROM conversations').run();
 }
 
+// Historial completo de una sesión (para el botón "Ver detalles" del Dashboard).
+function getConversationsBySession(sessionId) {
+  return db.prepare(`
+    SELECT session_id AS sessionId, channel, message, intent, score, resolved, answer, created_at AS time
+    FROM conversations WHERE session_id = ? ORDER BY id ASC
+  `).all(sessionId).map((r) => ({ ...r, resolved: !!r.resolved }));
+}
+
 // "Activa ahora" = una sesión (session_id) con al menos un mensaje en los
 // últimos `windowMinutes`. No hay sesiones reales con estado (sin WebSockets),
 // así que esto es una aproximación: activa = escribió hace poco. El estado
@@ -350,5 +358,6 @@ module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb,
   recordConversation, getMetrics, resetMetrics, getTimeseries, getActiveSessions,
+  getConversationsBySession,
   getResolutionThreshold, setResolutionThreshold,
 };

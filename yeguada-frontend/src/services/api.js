@@ -71,6 +71,12 @@ export async function fetchTimeseries() {
   return res.json();
 }
 
+export async function fetchConversationHistory(sessionId) {
+  const res = await fetch(`${BASE}/conversations/${encodeURIComponent(sessionId)}`);
+  if (!res.ok) throw new Error(`Conversations error ${res.status}`);
+  return res.json();
+}
+
 export async function fetchIntents() {
   const res = await fetch(`${BASE}/intents`);
   if (!res.ok) throw new Error(`Intents error ${res.status}`);
