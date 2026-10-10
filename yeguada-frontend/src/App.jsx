@@ -16,7 +16,7 @@ const MainContent = memo(function MainContent({
   const renderPage = () => {
     switch (activePage) {
       case 'dashboard': return <Dashboard metrics={metrics} />;
-      case 'intents':   return <Intents />;
+      case 'intents':   return <Intents metrics={metrics} />;
       case 'kb':        return <KnowledgeBase />;
       case 'monitor':   return <Monitor metrics={metrics} />;
       case 'config':    return <Config backendOnline={backendOnline} />;

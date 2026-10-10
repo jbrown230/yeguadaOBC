@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const { metrics, trainModel, processMessage, resetMetrics } = require('./nlp');
 const whatsapp = require('./whatsapp');
+const db = require('./db');
 
 const app = express();
 app.use(cors());
@@ -40,19 +41,90 @@ app.use(express.json());
     });
   });
 
-  // GET /api/intents — Lista de intenciones configuradas
-  app.get('/api/intents', (req, res) => {
-    const intentList = [
-      { id: 'booking.tour', name: 'Reserva de Tours', examples: ['quiero reservar un tour', 'cómo hago una reserva', 'quiero ir a la yeguada'] },
-      { id: 'pricing.info', name: 'Precios y Tarifas', examples: ['cuánto cuesta', 'cuál es el precio', 'tarifa grupal'] },
-      { id: 'guide.availability', name: 'Disponibilidad de Guía', examples: ['hay guías disponibles', 'necesito un guía'] },
-      { id: 'general.info', name: 'Información General', examples: ['qué actividades ofrecen', 'qué hay para hacer'] },
-      { id: 'location.directions', name: 'Cómo Llegar', examples: ['cómo llego', 'dónde queda', 'dirección'] },
-      { id: 'camping.info', name: 'Camping', examples: ['puedo acampar', 'área de camping', 'pasar la noche'] },
-      { id: 'waterfall.info', name: 'Cascadas', examples: ['cascadas celestes', 'la silampa', 'tour a cascadas'] },
-      { id: 'hours.info', name: 'Horarios', examples: ['cuál es el horario', 'a qué hora abren'] },
-    ];
-    res.json(intentList);
+  // ── Intenciones NLP — CRUD persistido en SQLite (ver db.js) ──
+  // Cualquier cambio reentrena el modelo para que surta efecto de inmediato.
+
+  // GET /api/intents — Lista de intenciones configuradas (con sus frases de ejemplo)
+  app.get('/api/intents', (_, res) => {
+    res.json(db.listIntents());
+  });
+
+  // POST /api/intents — Crear una nueva intención
+  app.post('/api/intents', async (req, res) => {
+    const { name, answer, examples } = req.body;
+    if (!name || !answer || !Array.isArray(examples) || examples.length === 0) {
+      return res.status(400).json({ error: 'name, answer y examples (array no vacío) son requeridos' });
+    }
+    const intent = db.createIntent({ name, answer, examples });
+    await trainModel();
+    res.status(201).json(intent);
+  });
+
+  // PUT /api/intents/:id — Editar nombre, respuesta y/o frases de ejemplo
+  app.put('/api/intents/:id', async (req, res) => {
+    const { name, answer, examples } = req.body;
+    if (!name || !answer) {
+      return res.status(400).json({ error: 'name y answer son requeridos' });
+    }
+    try {
+      const intent = db.updateIntent(req.params.id, { name, answer, examples });
+      await trainModel();
+      res.json(intent);
+    } catch (err) {
+      res.status(404).json({ error: err.message });
+    }
+  });
+
+  // DELETE /api/intents/:id — Eliminar una intención
+  app.delete('/api/intents/:id', async (req, res) => {
+    try {
+      db.deleteIntent(req.params.id);
+      await trainModel();
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(404).json({ error: err.message });
+    }
+  });
+
+  // ── Base de Conocimiento — CRUD persistido en SQLite ──
+  // Son pares de referencia (pregunta/respuesta/tags); no re-entrenan el
+  // modelo por sí solos — eso lo hacen las intenciones de arriba.
+
+  // GET /api/kb — Listar entradas
+  app.get('/api/kb', (_, res) => {
+    res.json(db.listKb());
+  });
+
+  // POST /api/kb — Crear entrada
+  app.post('/api/kb', (req, res) => {
+    const { question, answer, tags, intentId } = req.body;
+    if (!question || !answer) {
+      return res.status(400).json({ error: 'question y answer son requeridos' });
+    }
+    res.status(201).json(db.createKb({ intentId, question, answer, tags }));
+  });
+
+  // PUT /api/kb/:id — Editar entrada
+  app.put('/api/kb/:id', (req, res) => {
+    const { question, answer, tags, intentId } = req.body;
+    if (!question || !answer) {
+      return res.status(400).json({ error: 'question y answer son requeridos' });
+    }
+    try {
+      res.json(db.updateKb(Number(req.params.id), { intentId, question, answer, tags }));
+    } catch (err) {
+      res.status(404).json({ error: err.message });
+    }
+  });
+
+  // DELETE /api/kb/:id — Eliminar entrada
+  app.delete('/api/kb/:id', (req, res) => {
+    try {
+      db.deleteKb(Number(req.params.id));
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(404).json({ error: err.message });
+    }
   });
 
   // DELETE /api/metrics/reset — Limpiar métricas en memoria (llamado desde el botón Limpiar del frontend)
@@ -91,7 +163,8 @@ app.use(express.json());
     console.log('La Yeguada Chatbot Backend corriendo en http://localhost:3001');
     console.log('   POST /api/chat              — Clasificar mensaje');
     console.log('   GET  /api/metrics           — Métricas del dashboard');
-    console.log('   GET  /api/intents           — Listar intenciones');
+    console.log('   GET  /api/intents           — Listar intenciones (CRUD completo)');
+    console.log('   GET  /api/kb                — Base de conocimiento (CRUD completo)');
     console.log('   GET  /api/whatsapp/status    — Estado del bot de WhatsApp');
     console.log('   POST /api/whatsapp/connect   — Conectar (código QR)');
     console.log('   POST /api/whatsapp/disconnect — Desconectar\n');
