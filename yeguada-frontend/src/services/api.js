@@ -71,6 +71,71 @@ export async function fetchIntents() {
   return res.json();
 }
 
+export async function createIntent({ name, answer, examples }) {
+  const res = await fetch(`${BASE}/intents`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, answer, examples }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Intents error ${res.status}`);
+  return data;
+}
+
+export async function updateIntent(id, { name, answer, examples }) {
+  const res = await fetch(`${BASE}/intents/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, answer, examples }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Intents error ${res.status}`);
+  return data;
+}
+
+export async function deleteIntent(id) {
+  const res = await fetch(`${BASE}/intents/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Intents error ${res.status}`);
+  return data;
+}
+
+// ── Base de conocimiento (persistida en el backend) ───────────────────────────
+export async function fetchKb() {
+  const res = await fetch(`${BASE}/kb`);
+  if (!res.ok) throw new Error(`KB error ${res.status}`);
+  return res.json();
+}
+
+export async function createKbEntry({ intentId, question, answer, tags }) {
+  const res = await fetch(`${BASE}/kb`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ intentId, question, answer, tags }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `KB error ${res.status}`);
+  return data;
+}
+
+export async function updateKbEntry(id, { intentId, question, answer, tags }) {
+  const res = await fetch(`${BASE}/kb/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ intentId, question, answer, tags }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `KB error ${res.status}`);
+  return data;
+}
+
+export async function deleteKbEntry(id) {
+  const res = await fetch(`${BASE}/kb/${id}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `KB error ${res.status}`);
+  return data;
+}
+
 export async function resetBackendMetrics() {
   try {
     await fetch(`${BASE}/metrics/reset`, { method: 'DELETE' });
@@ -131,22 +196,3 @@ export const MOCK_METRICS = {
   recentConversations: [],
 };
 
-export const MOCK_INTENTS = [
-  { id: 'booking.tour',        name: 'Reserva de Tours',         examples: ['quiero reservar un tour', 'cómo reservo', 'apartar un cupo'] },
-  { id: 'pricing.info',        name: 'Precios y Tarifas',        examples: ['cuánto cuesta', 'cuál es la tarifa', 'precio grupal'] },
-  { id: 'guide.availability',  name: 'Disponibilidad de Guía',   examples: ['hay guías disponibles', 'necesito un guía'] },
-  { id: 'general.info',        name: 'Información General',      examples: ['qué actividades hay', 'cuéntame sobre la yeguada'] },
-  { id: 'location.directions', name: 'Cómo Llegar',              examples: ['cómo llego', 'dónde queda', 'ruta desde panamá'] },
-  { id: 'camping.info',        name: 'Camping',                  examples: ['puedo acampar', 'área de carpas', 'pasar la noche'] },
-  { id: 'waterfall.info',      name: 'Cascadas',                 examples: ['cascadas celestes', 'la silampa', 'tour cascadas'] },
-  { id: 'hours.info',          name: 'Horarios',                 examples: ['a qué hora abren', 'cuál es el horario'] },
-];
-
-export const KB_ENTRIES = [
-  { id: 1, intent: 'booking.tour', question: '¿Cómo puedo reservar un tour en La Yeguada?', answer: 'Para reservar un tour, contáctenos por WhatsApp al +507 6XXX-XXXX. Reserve con al menos 48h de anticipación.', tags: ['tours', 'reserva', 'WhatsApp'] },
-  { id: 2, intent: 'pricing.info', question: '¿Cuáles son los precios de los tours?', answer: 'Senderismo básico: $25/persona. Cascadas: $35/persona. Tour completo + almuerzo: $45/persona. Grupos 8+: 15% descuento.', tags: ['precios', 'tours'] },
-  { id: 3, intent: 'location.directions', question: '¿Cómo llego a la Reserva Forestal La Yeguada?', answer: 'Desde Ciudad de Panamá: Carretera Interamericana → desvío en El Jagüito → Calobre → La Yeguada (~260 km, 4-5 horas). Se recomienda 4x4.', tags: ['cómo llegar', 'ubicación'] },
-  { id: 4, intent: 'general.info', question: '¿Qué actividades ofrece Ecoturismo La Yeguada OBC?', answer: 'Senderismo, Cascadas Celestes, kayak en la Laguna volcánica, agroturismo, avistamiento de aves (200+ sp.), camping y talleres culturales.', tags: ['actividades', 'tours'] },
-  { id: 5, intent: 'camping.info', question: '¿Se puede acampar en La Yeguada?', answer: 'Sí. Zona natural a orillas de la Laguna y Estación ANAM con baños/duchas. Capacidad limitada — reserve con anticipación.', tags: ['camping', 'noche'] },
-  { id: 6, intent: 'waterfall.info', question: '¿Cómo visito las Cascadas Celestes?', answer: 'Sendero ~45 min, incluida en tour $35. La Cascada La Silampa requiere ~1h45 con guía.', tags: ['cascadas', 'senderismo'] },
-];

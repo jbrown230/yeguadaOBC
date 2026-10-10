@@ -5,6 +5,12 @@ node_modules/
 yeguada-backend/.wwebjs_auth/
 yeguada-backend/.wwebjs_cache/
 
+# Base de datos local (SQLite) — se crea y se siembra sola al arrancar
+yeguada-backend/data.db
+yeguada-backend/data.db-journal
+yeguada-backend/data.db-wal
+yeguada-backend/data.db-shm
+
 # Variables de entorno
 .env
 .env.local
