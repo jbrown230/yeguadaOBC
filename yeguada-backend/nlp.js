@@ -26,7 +26,8 @@ const RESOLUTION_THRESHOLD = 0.7;
 
 // Reconstruye el manager desde cero con las intenciones actuales de la BD
 // y lo entrena. Se llama al arrancar el servidor y después de cualquier
-// cambio en intenciones (crear/editar/eliminar) desde el dashboard.
+// cambio en intenciones o en la Base de Conocimiento (crear/editar/eliminar)
+// desde el dashboard.
 async function trainModel() {
   console.log('Entrenando modelo NLP...');
   const fresh = new NlpManager({ languages: ['es'], forceNER: true });
@@ -39,10 +40,21 @@ async function trainModel() {
     fresh.addAnswer('es', intent.id, intent.answer);
   }
 
+  // Las entradas de la Base de Conocimiento con una intención asociada también
+  // entrenan al modelo — su "pregunta" se suma como frase de ejemplo de esa
+  // intención (la respuesta que usa el bot sigue siendo la de la intención,
+  // no la de la entrada, para mantener una sola respuesta predecible por intención).
+  let kbCount = 0;
+  for (const entry of db.listKb()) {
+    if (!entry.intent_id) continue;
+    fresh.addDocument('es', entry.question, entry.intent_id);
+    kbCount++;
+  }
+
   await fresh.train();
   fresh.save();
   manager = fresh;
-  console.log(`Modelo entrenado y guardado (${intents.length} intenciones).\n`);
+  console.log(`Modelo entrenado y guardado (${intents.length} intenciones, ${kbCount} preguntas de la Base de Conocimiento).\n`);
 }
 
 // Procesa un mensaje, actualiza métricas y devuelve la respuesta.

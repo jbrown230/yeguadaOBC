@@ -90,7 +90,7 @@ export default function KnowledgeBase() {
       <div className="page-head">
         <div>
           <h1 className="page-title">Base de Conocimiento</h1>
-          <div className="page-sub">Pares de pregunta y respuesta de referencia para el equipo</div>
+          <div className="page-sub">Pares de pregunta y respuesta — las que tienen una intención asociada también entrenan al chatbot</div>
         </div>
         <button className="btn btn-primary" onClick={startAdd}>
           <Icon name="plus" size={15} />
@@ -120,11 +120,16 @@ export default function KnowledgeBase() {
           <div className="field">
             <label className="field-label">Intención relacionada</label>
             <select className="input" value={form.intentId} onChange={(e) => setForm((p) => ({ ...p, intentId: e.target.value }))}>
-              <option value="">— Sin intención asociada —</option>
+              <option value="">— Sin intención asociada (solo referencia) —</option>
               {intents.map((i) => (
                 <option key={i.id} value={i.id}>{i.name} ({i.id})</option>
               ))}
             </select>
+            {form.intentId && (
+              <p style={{ fontSize: 11.5, color: 'var(--text-sec)', marginTop: 6 }}>
+                Esta pregunta se agregará como frase de entrenamiento de <strong>{form.intentId}</strong> al guardar.
+              </p>
+            )}
           </div>
           {[
             { key: 'question', label: 'Pregunta / Consulta', placeholder: '¿Cómo cancelo mi reserva?' },
@@ -141,7 +146,7 @@ export default function KnowledgeBase() {
           ))}
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-              {saving ? 'Guardando…' : 'Guardar'}
+              {saving ? (form.intentId ? 'Guardando y reentrenando…' : 'Guardando…') : 'Guardar'}
             </button>
             <button className="btn btn-secondary" onClick={cancelForm} disabled={saving}>Cancelar</button>
           </div>

@@ -87,8 +87,9 @@ app.use(express.json());
   });
 
   // ── Base de Conocimiento — CRUD persistido en SQLite ──
-  // Son pares de referencia (pregunta/respuesta/tags); no re-entrenan el
-  // modelo por sí solos — eso lo hacen las intenciones de arriba.
+  // Las entradas con una intención asociada también entrenan al modelo
+  // (su "pregunta" se suma como frase de ejemplo de esa intención), así
+  // que cualquier cambio reentrena igual que con las intenciones.
 
   // GET /api/kb — Listar entradas
   app.get('/api/kb', (_, res) => {
@@ -96,31 +97,36 @@ app.use(express.json());
   });
 
   // POST /api/kb — Crear entrada
-  app.post('/api/kb', (req, res) => {
+  app.post('/api/kb', async (req, res) => {
     const { question, answer, tags, intentId } = req.body;
     if (!question || !answer) {
       return res.status(400).json({ error: 'question y answer son requeridos' });
     }
-    res.status(201).json(db.createKb({ intentId, question, answer, tags }));
+    const entry = db.createKb({ intentId, question, answer, tags });
+    if (intentId) await trainModel();
+    res.status(201).json(entry);
   });
 
   // PUT /api/kb/:id — Editar entrada
-  app.put('/api/kb/:id', (req, res) => {
+  app.put('/api/kb/:id', async (req, res) => {
     const { question, answer, tags, intentId } = req.body;
     if (!question || !answer) {
       return res.status(400).json({ error: 'question y answer son requeridos' });
     }
     try {
-      res.json(db.updateKb(Number(req.params.id), { intentId, question, answer, tags }));
+      const entry = db.updateKb(Number(req.params.id), { intentId, question, answer, tags });
+      await trainModel();
+      res.json(entry);
     } catch (err) {
       res.status(404).json({ error: err.message });
     }
   });
 
   // DELETE /api/kb/:id — Eliminar entrada
-  app.delete('/api/kb/:id', (req, res) => {
+  app.delete('/api/kb/:id', async (req, res) => {
     try {
       db.deleteKb(Number(req.params.id));
+      await trainModel();
       res.json({ ok: true });
     } catch (err) {
       res.status(404).json({ error: err.message });
