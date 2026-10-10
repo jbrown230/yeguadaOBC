@@ -1,33 +1,33 @@
 // pages/Dashboard.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import KpiCard from '../components/Kpicard';
-
-const WEEK_DATA = [
-  { day: 'Lun', chatbot: 85, humano: 20 },
-  { day: 'Mar', chatbot: 92, humano: 18 },
-  { day: 'Mié', chatbot: 78, humano: 25 },
-  { day: 'Jue', chatbot: 110, humano: 28 },
-  { day: 'Vie', chatbot: 120, humano: 22 },
-  { day: 'Sáb', chatbot: 95, humano: 30 },
-  { day: 'Dom', chatbot: 60, humano: 15 },
-];
-
-const MONTH_DATA = [
-  { day: 'Sem 1', chatbot: 520, humano: 110 },
-  { day: 'Sem 2', chatbot: 610, humano: 140 },
-  { day: 'Sem 3', chatbot: 580, humano: 130 },
-  { day: 'Sem 4', chatbot: 640, humano: 150 },
-];
+import { fetchTimeseries } from '../services/api';
 
 const PIE_COLORS = ['#396B2C', '#FFA700', '#8A5A12', '#7B8190', '#A3312A', '#454A54'];
 
 export default function Dashboard({ metrics }) {
   const [range, setRange] = useState('week');
-  const chartData = range === 'week' ? WEEK_DATA : MONTH_DATA;
+  const [timeseries, setTimeseries] = useState({ week: [], month: [] });
+
+  const loadTimeseries = useCallback(async () => {
+    try { setTimeseries(await fetchTimeseries()); } catch { /* backend offline — deja los datos anteriores */ }
+  }, []);
+
+  useEffect(() => {
+    loadTimeseries();
+    const interval = setInterval(loadTimeseries, 30000);
+    window.addEventListener('yeguada:metrics:updated', loadTimeseries);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('yeguada:metrics:updated', loadTimeseries);
+    };
+  }, [loadTimeseries]);
+
+  const chartData = range === 'week' ? timeseries.week : timeseries.month;
 
   // Build pie data from intentCounts
   const intentLabels = {

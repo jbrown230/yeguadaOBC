@@ -134,6 +134,11 @@ app.use(express.json());
     }
   });
 
+  // GET /api/metrics/timeseries — Volumen real de chats (chatbot vs. humano) por día/semana
+  app.get('/api/metrics/timeseries', (_, res) => {
+    res.json(db.getTimeseries());
+  });
+
   // DELETE /api/metrics/reset — Borrar historial de conversaciones (llamado desde el botón Limpiar del frontend)
   app.delete('/api/metrics/reset', (_, res) => {
     db.resetMetrics();

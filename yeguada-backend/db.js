@@ -256,6 +256,50 @@ function resetMetrics() {
   db.prepare('DELETE FROM conversations').run();
 }
 
+const DAY_ABBR = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']; // Date.getDay(): 0 = domingo
+function dayKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+// Volumen real de chats (chatbot vs. escalado a humano) para los gráficos
+// del Dashboard: últimos 7 días y últimas 4 semanas (de 7 días cada una).
+function getTimeseries() {
+  const cutoff = new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString();
+  const rows = db.prepare('SELECT created_at, resolved FROM conversations WHERE created_at >= ?').all(cutoff);
+
+  const byDay = {};
+  for (const row of rows) {
+    const key = dayKey(new Date(row.created_at));
+    if (!byDay[key]) byDay[key] = { chatbot: 0, humano: 0 };
+    if (row.resolved) byDay[key].chatbot++;
+    else byDay[key].humano++;
+  }
+
+  const today = new Date();
+
+  const week = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const counts = byDay[dayKey(d)] || { chatbot: 0, humano: 0 };
+    week.push({ day: DAY_ABBR[d.getDay()], chatbot: counts.chatbot, humano: counts.humano });
+  }
+
+  const month = [];
+  for (let w = 3; w >= 0; w--) {
+    let chatbot = 0, humano = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - (w * 7 + i));
+      const counts = byDay[dayKey(d)];
+      if (counts) { chatbot += counts.chatbot; humano += counts.humano; }
+    }
+    month.push({ day: `Sem ${4 - w}`, chatbot, humano });
+  }
+
+  return { week, month };
+}
+
 // ── Configuración (clave/valor genérico — persistida) ──
 const DEFAULT_RESOLUTION_THRESHOLD = 0.7;
 
@@ -285,6 +329,6 @@ function setResolutionThreshold(value) {
 module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb,
-  recordConversation, getMetrics, resetMetrics,
+  recordConversation, getMetrics, resetMetrics, getTimeseries,
   getResolutionThreshold, setResolutionThreshold,
 };
