@@ -65,6 +65,12 @@ export async function fetchMetrics() {
   return res.json();
 }
 
+export async function fetchTimeseries() {
+  const res = await fetch(`${BASE}/metrics/timeseries`);
+  if (!res.ok) throw new Error(`Timeseries error ${res.status}`);
+  return res.json();
+}
+
 export async function fetchIntents() {
   const res = await fetch(`${BASE}/intents`);
   if (!res.ok) throw new Error(`Intents error ${res.status}`);
