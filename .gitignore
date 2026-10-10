@@ -1,6 +1,10 @@
 # Dependencias
 node_modules/
 
+# Sesión de WhatsApp (whatsapp-web.js)
+yeguada-backend/.wwebjs_auth/
+yeguada-backend/.wwebjs_cache/
+
 # Variables de entorno
 .env
 .env.local

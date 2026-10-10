@@ -82,6 +82,31 @@ export async function checkHealth() {
   catch { return false; }
 }
 
+// ── Control del bot de WhatsApp (whatsapp-web.js) ─────────────────────────────
+export async function fetchWhatsappStatus() {
+  const res = await fetch(`${BASE}/whatsapp/status`);
+  if (!res.ok) throw new Error(`WhatsApp status error ${res.status}`);
+  return res.json();
+}
+
+export async function connectWhatsapp() {
+  const res = await fetch(`${BASE}/whatsapp/connect`, { method: 'POST' });
+  if (!res.ok) throw new Error(`WhatsApp connect error ${res.status}`);
+  return res.json();
+}
+
+export async function disconnectWhatsapp() {
+  const res = await fetch(`${BASE}/whatsapp/disconnect`, { method: 'POST' });
+  if (!res.ok) throw new Error(`WhatsApp disconnect error ${res.status}`);
+  return res.json();
+}
+
+export async function reconnectWhatsapp() {
+  const res = await fetch(`${BASE}/whatsapp/reconnect`, { method: 'POST' });
+  if (!res.ok) throw new Error(`WhatsApp reconnect error ${res.status}`);
+  return res.json();
+}
+
 // ── Métricas locales (cuando backend está offline) ───────────────────────────
 export function getLocalMetrics() {
   const stats  = initStats();
