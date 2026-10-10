@@ -43,6 +43,11 @@ app.use(express.json());
     });
   });
 
+  // GET /api/conversations/:sessionId — Historial completo de una sesión
+  app.get('/api/conversations/:sessionId', (req, res) => {
+    res.json(db.getConversationsBySession(req.params.sessionId));
+  });
+
   // ── Intenciones NLP — CRUD persistido en SQLite (ver db.js) ──
   // Cualquier cambio reentrena el modelo para que surta efecto de inmediato.
 

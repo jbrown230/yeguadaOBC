@@ -5,13 +5,34 @@ import {
   ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import KpiCard from '../components/Kpicard';
-import { fetchTimeseries } from '../services/api';
+import Icon from '../components/Icon';
+import { fetchTimeseries, fetchConversationHistory } from '../services/api';
 
 const PIE_COLORS = ['#396B2C', '#FFA700', '#8A5A12', '#7B8190', '#A3312A', '#454A54'];
 
 export default function Dashboard({ metrics }) {
   const [range, setRange] = useState('week');
   const [timeseries, setTimeseries] = useState({ week: [], month: [] });
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  async function openDetails(sessionId) {
+    setSelectedSession(sessionId);
+    setLoadingHistory(true);
+    try {
+      setHistory(await fetchConversationHistory(sessionId));
+    } catch {
+      setHistory([]);
+    } finally {
+      setLoadingHistory(false);
+    }
+  }
+
+  function closeDetails() {
+    setSelectedSession(null);
+    setHistory([]);
+  }
 
   const loadTimeseries = useCallback(async () => {
     try { setTimeseries(await fetchTimeseries()); } catch { /* backend offline — deja los datos anteriores */ }
@@ -158,7 +179,9 @@ export default function Dashboard({ metrics }) {
                       </span>
                     </td>
                     <td>
-                      <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px' }}>Ver detalles</button>
+                      <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px' }} onClick={() => openDetails(c.sessionId)}>
+                        Ver detalles
+                      </button>
                     </td>
                   </tr>
                 );
@@ -167,6 +190,58 @@ export default function Dashboard({ metrics }) {
           </table>
         </div>
       </div>
+
+      {/* Modal — historial de la sesión */}
+      {selectedSession && (
+        <div className="drawer-overlay active" onClick={closeDetails} style={{ zIndex: 60, background: 'rgba(10, 11, 13, 0.14)' }}>
+          <div
+            className="panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+              width: 'min(480px, 92vw)', maxHeight: '80vh',
+              display: 'flex', flexDirection: 'column', boxShadow: 'var(--shadow-md)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+              <div>
+                <div className="panel-title">Historial de conversación</div>
+                <div className="mono" style={{ fontSize: 11, color: 'var(--text-ter)' }}>{selectedSession}</div>
+              </div>
+              <button className="icon-btn" onClick={closeDetails} aria-label="Cerrar">
+                <Icon name="close" size={16} />
+              </button>
+            </div>
+
+            <div style={{ flex: 1, overflowY: 'auto', padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {loadingHistory && <div className="loading-state"><div className="spinner" /></div>}
+              {!loadingHistory && history.length === 0 && (
+                <div className="empty-state">Sin mensajes para esta sesión.</div>
+              )}
+              {!loadingHistory && history.map((h, i) => {
+                const time = new Date(h.time).toLocaleString('es', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                return (
+                  <React.Fragment key={i}>
+                    <div className="chat-msg-row user">
+                      <div className="chat-bubble user">{h.message}</div>
+                      <div className="chat-time">{time}</div>
+                    </div>
+                    <div className="chat-msg-row bot">
+                      <div className="chat-bubble bot">{h.answer}</div>
+                      <div className="chat-time">{time}</div>
+                      {h.intent && h.intent !== 'None' && (
+                        <span className="tag tag-accent tag-mono chat-intent-tag">
+                          {h.intent} · {Math.round((h.score || 0) * 100)}%
+                        </span>
+                      )}
+                    </div>
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
