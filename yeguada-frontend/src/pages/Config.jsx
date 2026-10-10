@@ -1,6 +1,7 @@
 // pages/Config.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWhatsapp } from '../hooks/useWhatsapp';
+import { fetchConfig, updateConfig } from '../services/api';
 
 const WA_LABELS = {
   disconnected: 'Desconectado',
@@ -36,12 +37,44 @@ const Section = ({ title, children }) => (
 
 export default function Config({ backendOnline }) {
   const [threshold, setThreshold] = useState(70);
+  const [savedThreshold, setSavedThreshold] = useState(70);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
   const wa = useWhatsapp();
 
-  function handleSave() {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const loadConfig = useCallback(async () => {
+    try {
+      const { resolutionThreshold } = await fetchConfig();
+      const pct = Math.round(resolutionThreshold * 100);
+      setThreshold(pct);
+      setSavedThreshold(pct);
+      setError(null);
+    } catch {
+      // backend offline al cargar — se queda con el valor por defecto
+    }
+  }, []);
+
+  useEffect(() => { loadConfig(); }, [loadConfig]);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await updateConfig({ resolutionThreshold: threshold / 100 });
+      setSavedThreshold(threshold);
+      setError(null);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleCancel() {
+    setThreshold(savedThreshold);
+    setError(null);
   }
 
   const waStatus = wa.status.status;
@@ -150,10 +183,11 @@ export default function Config({ backendOnline }) {
         ))}
       </Section>
 
+      {error && <p style={{ fontSize: 12, color: 'var(--danger)', textAlign: 'right', marginBottom: 10 }}>{error}</p>}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-        <button className="btn btn-secondary">Cancelar</button>
-        <button onClick={handleSave} className={`btn btn-primary ${saved ? 'is-success' : ''}`}>
-          {saved ? 'Guardado' : 'Guardar Cambios'}
+        <button className="btn btn-secondary" onClick={handleCancel} disabled={saving || threshold === savedThreshold}>Cancelar</button>
+        <button onClick={handleSave} className={`btn btn-primary ${saved ? 'is-success' : ''}`} disabled={saving || threshold === savedThreshold}>
+          {saving ? 'Guardando…' : saved ? 'Guardado' : 'Guardar Cambios'}
         </button>
       </div>
     </div>

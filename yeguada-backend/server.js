@@ -144,6 +144,24 @@ app.use(express.json());
   // GET /api/health
   app.get('/api/health', (_, res) => res.json({ status: 'ok', model: 'node-nlp-es', version: '1.0.0' }));
 
+  // ── Configuración — persistida en SQLite ──
+
+  // GET /api/config — Configuración actual (ej. umbral de confianza)
+  app.get('/api/config', (_, res) => {
+    res.json({ resolutionThreshold: db.getResolutionThreshold() });
+  });
+
+  // PUT /api/config — Actualizar configuración
+  app.put('/api/config', (req, res) => {
+    const { resolutionThreshold } = req.body;
+    try {
+      const value = db.setResolutionThreshold(resolutionThreshold);
+      res.json({ resolutionThreshold: value });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
   // ── Bot de WhatsApp — control dinámico desde el dashboard ──
 
   // GET /api/whatsapp/status — Estado actual (disconnected/initializing/qr/authenticated/connected)

@@ -48,6 +48,11 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
   CREATE INDEX IF NOT EXISTS idx_conversations_created ON conversations(created_at);
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
 `);
 
 // ── Slug único a partir del nombre (ids legibles tipo 'booking.tour') ──
@@ -251,8 +256,35 @@ function resetMetrics() {
   db.prepare('DELETE FROM conversations').run();
 }
 
+// ── Configuración (clave/valor genérico — persistida) ──
+const DEFAULT_RESOLUTION_THRESHOLD = 0.7;
+
+function getSetting(key, fallback) {
+  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key);
+  return row ? row.value : fallback;
+}
+
+function setSetting(key, value) {
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
+    .run(key, String(value));
+}
+
+function getResolutionThreshold() {
+  return Number(getSetting('resolution_threshold', DEFAULT_RESOLUTION_THRESHOLD));
+}
+
+function setResolutionThreshold(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0 || n > 1) {
+    throw new Error('resolutionThreshold debe ser un número entre 0 y 1');
+  }
+  setSetting('resolution_threshold', n);
+  return n;
+}
+
 module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb,
   recordConversation, getMetrics, resetMetrics,
+  getResolutionThreshold, setResolutionThreshold,
 };

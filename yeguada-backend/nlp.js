@@ -12,7 +12,6 @@ const db = require('./db');
 let manager = new NlpManager({ languages: ['es'], forceNER: true });
 
 const ESCALATION_MESSAGE = '🔄 Esta consulta requiere atención personalizada. Te conectaré con un operador humano en breve. También puedes escribirnos directamente al WhatsApp +507 6XXX-XXXX.';
-const RESOLUTION_THRESHOLD = 0.7;
 
 // Reconstruye el manager desde cero con las intenciones actuales de la BD
 // y lo entrena. Se llama al arrancar el servidor y después de cualquier
@@ -56,7 +55,7 @@ async function processMessage(message, sessionId, channel = 'dashboard') {
   // node-nlp devuelve intent 'None' con score 1 (no un score bajo en la intención
   // más cercana) cuando ninguna intención entrenada supera su umbral interno.
   // Sin este chequeo, 'None' se contaba como resuelto pero sin `answer` real.
-  const resolved = response.intent !== 'None' && response.score >= RESOLUTION_THRESHOLD;
+  const resolved = response.intent !== 'None' && response.score >= db.getResolutionThreshold();
 
   db.recordConversation({
     sessionId,
