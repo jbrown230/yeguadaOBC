@@ -34,6 +34,20 @@ db.exec(`
     tags TEXT NOT NULL DEFAULT '[]',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS conversations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT,
+    channel TEXT NOT NULL DEFAULT 'dashboard',
+    message TEXT NOT NULL,
+    intent TEXT,
+    score REAL,
+    resolved INTEGER NOT NULL,
+    answer TEXT,
+    response_time_ms INTEGER,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_conversations_created ON conversations(created_at);
 `);
 
 // ── Slug único a partir del nombre (ids legibles tipo 'booking.tour') ──
@@ -193,7 +207,52 @@ function deleteKb(id) {
   if (result.changes === 0) throw new Error(`Entrada '${id}' no encontrada`);
 }
 
+// ── Métricas / conversaciones (persistidas — sobreviven reinicios) ──
+function recordConversation({ sessionId, channel, message, intent, score, resolved, answer, responseTimeMs }) {
+  db.prepare(`
+    INSERT INTO conversations (session_id, channel, message, intent, score, resolved, answer, response_time_ms, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(sessionId || 'anon', channel, message, intent, score, resolved ? 1 : 0, answer, responseTimeMs, new Date().toISOString());
+}
+
+function getMetrics() {
+  const totals = db.prepare(`
+    SELECT
+      COUNT(*) AS totalChats,
+      SUM(CASE WHEN resolved = 1 THEN 1 ELSE 0 END) AS resolvedByBot,
+      SUM(CASE WHEN resolved = 0 THEN 1 ELSE 0 END) AS escalatedToHuman,
+      COALESCE(SUM(response_time_ms), 0) AS totalResponseTimeMs
+    FROM conversations
+  `).get();
+
+  const intentCounts = {};
+  for (const row of db.prepare(`
+    SELECT COALESCE(intent, 'unknown') AS intent, COUNT(*) AS count FROM conversations GROUP BY intent
+  `).all()) {
+    intentCounts[row.intent] = row.count;
+  }
+
+  const recentConversations = db.prepare(`
+    SELECT session_id AS sessionId, channel, message, intent, score, resolved, answer, created_at AS time
+    FROM conversations ORDER BY id DESC LIMIT 20
+  `).all().map((r) => ({ ...r, resolved: !!r.resolved }));
+
+  return {
+    totalChats: totals.totalChats || 0,
+    resolvedByBot: totals.resolvedByBot || 0,
+    escalatedToHuman: totals.escalatedToHuman || 0,
+    totalResponseTimeMs: totals.totalResponseTimeMs || 0,
+    intentCounts,
+    recentConversations,
+  };
+}
+
+function resetMetrics() {
+  db.prepare('DELETE FROM conversations').run();
+}
+
 module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb,
+  recordConversation, getMetrics, resetMetrics,
 };
