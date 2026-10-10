@@ -8,16 +8,6 @@
 const { NlpManager } = require('node-nlp');
 const db = require('./db');
 
-// ── Métricas en memoria (compartidas entre canales) ──
-const metrics = {
-  totalChats: 0,
-  resolvedByBot: 0,
-  escalatedToHuman: 0,
-  totalResponseTimeMs: 0,
-  intentCounts: {},
-  recentConversations: [],
-};
-
 // Reasignado por completo en cada trainModel() — nunca se muta en caliente.
 let manager = new NlpManager({ languages: ['es'], forceNER: true });
 
@@ -68,25 +58,16 @@ async function processMessage(message, sessionId, channel = 'dashboard') {
   // Sin este chequeo, 'None' se contaba como resuelto pero sin `answer` real.
   const resolved = response.intent !== 'None' && response.score >= RESOLUTION_THRESHOLD;
 
-  metrics.totalChats++;
-  metrics.totalResponseTimeMs += elapsed;
-  if (resolved) metrics.resolvedByBot++;
-  else metrics.escalatedToHuman++;
-
-  const intentKey = response.intent || 'unknown';
-  metrics.intentCounts[intentKey] = (metrics.intentCounts[intentKey] || 0) + 1;
-
-  metrics.recentConversations.unshift({
-    sessionId: sessionId || 'anon',
+  db.recordConversation({
+    sessionId,
     channel,
-    time: new Date().toISOString(),
     message,
     intent: response.intent,
     score: response.score,
     resolved,
     answer: response.answer,
+    responseTimeMs: elapsed,
   });
-  if (metrics.recentConversations.length > 50) metrics.recentConversations.pop();
 
   return {
     intent: response.intent,
@@ -98,18 +79,7 @@ async function processMessage(message, sessionId, channel = 'dashboard') {
   };
 }
 
-function resetMetrics() {
-  metrics.totalChats = 0;
-  metrics.resolvedByBot = 0;
-  metrics.escalatedToHuman = 0;
-  metrics.totalResponseTimeMs = 0;
-  metrics.intentCounts = {};
-  metrics.recentConversations = [];
-}
-
 module.exports = {
-  metrics,
   trainModel,
   processMessage,
-  resetMetrics,
 };

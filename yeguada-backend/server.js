@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────
 const express = require('express');
 const cors = require('cors');
-const { metrics, trainModel, processMessage, resetMetrics } = require('./nlp');
+const { trainModel, processMessage } = require('./nlp');
 const whatsapp = require('./whatsapp');
 const db = require('./db');
 
@@ -28,8 +28,9 @@ app.use(express.json());
     res.json(result);
   });
 
-  // GET /api/metrics — Dashboard de métricas
-  app.get('/api/metrics', (req, res) => {
+  // GET /api/metrics — Dashboard de métricas (persistidas, sobreviven reinicios)
+  app.get('/api/metrics', (_, res) => {
+    const metrics = db.getMetrics();
     const total = metrics.totalChats || 1;
     res.json({
       totalChatsToday: metrics.totalChats,
@@ -37,7 +38,7 @@ app.use(express.json());
       escalationRate: Math.round((metrics.escalatedToHuman / total) * 100),
       avgResponseTimeMs: Math.round(metrics.totalResponseTimeMs / total),
       intentCounts: metrics.intentCounts,
-      recentConversations: metrics.recentConversations.slice(0, 20),
+      recentConversations: metrics.recentConversations,
     });
   });
 
@@ -133,9 +134,9 @@ app.use(express.json());
     }
   });
 
-  // DELETE /api/metrics/reset — Limpiar métricas en memoria (llamado desde el botón Limpiar del frontend)
+  // DELETE /api/metrics/reset — Borrar historial de conversaciones (llamado desde el botón Limpiar del frontend)
   app.delete('/api/metrics/reset', (_, res) => {
-    resetMetrics();
+    db.resetMetrics();
     console.log('🧹 Métricas reseteadas');
     res.json({ ok: true });
   });
