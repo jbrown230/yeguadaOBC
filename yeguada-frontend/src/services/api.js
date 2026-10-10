@@ -142,6 +142,24 @@ export async function resetBackendMetrics() {
   } catch {} // si el backend está offline no importa, el localStorage ya fue limpiado
 }
 
+// ── Configuración (umbral de confianza, persistida en el backend) ────────────
+export async function fetchConfig() {
+  const res = await fetch(`${BASE}/config`);
+  if (!res.ok) throw new Error(`Config error ${res.status}`);
+  return res.json();
+}
+
+export async function updateConfig({ resolutionThreshold }) {
+  const res = await fetch(`${BASE}/config`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ resolutionThreshold }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Config error ${res.status}`);
+  return data;
+}
+
 export async function checkHealth() {
   try { const res = await fetch(`${BASE}/health`); return res.ok; }
   catch { return false; }
