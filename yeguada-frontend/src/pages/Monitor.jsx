@@ -11,6 +11,7 @@ export default function Monitor(props) {
   const resolutionRate = metrics?.resolutionRate ?? 0;
   const escalationRate = metrics?.escalationRate ?? 0;
   const avgResponseTimeMs = metrics?.avgResponseTimeMs ?? 0;
+  const activeNow = metrics?.activeNow ?? { total: 0, chatbot: 0, humano: 0 };
 
   const intentData = Object.entries(intentCounts).map(([k, v]) => ({
     name: k.split('.')[0],
@@ -27,7 +28,7 @@ export default function Monitor(props) {
       </div>
 
       <div className="stat-strip">
-        <KpiCard label="Activas Ahora" value="3" sub="2 chatbot · 1 humano" />
+        <KpiCard label="Activas Ahora" value={activeNow.total} sub={`${activeNow.chatbot} chatbot · ${activeNow.humano} humano`} />
         <KpiCard label="Completadas Hoy" value={Math.round(totalChatsToday * (resolutionRate / 100))} sub={`${resolutionRate}% tasa de resolución`} />
         <KpiCard label="En Espera Humano" value={Math.round(totalChatsToday * (escalationRate / 100))} sub={`${escalationRate}% de escalamiento`} />
       </div>

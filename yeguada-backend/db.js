@@ -256,6 +256,26 @@ function resetMetrics() {
   db.prepare('DELETE FROM conversations').run();
 }
 
+// "Activa ahora" = una sesión (session_id) con al menos un mensaje en los
+// últimos `windowMinutes`. No hay sesiones reales con estado (sin WebSockets),
+// así que esto es una aproximación: activa = escribió hace poco. El estado
+// (chatbot/humano) se toma del último mensaje de esa sesión.
+function getActiveSessions(windowMinutes = 5) {
+  const cutoff = new Date(Date.now() - windowMinutes * 60 * 1000).toISOString();
+  const sessions = db.prepare(`
+    SELECT DISTINCT session_id FROM conversations WHERE created_at >= ? AND session_id IS NOT NULL
+  `).all(cutoff);
+
+  const latestStmt = db.prepare('SELECT resolved FROM conversations WHERE session_id = ? ORDER BY id DESC LIMIT 1');
+  let chatbot = 0, humano = 0;
+  for (const { session_id } of sessions) {
+    const latest = latestStmt.get(session_id);
+    if (latest && latest.resolved) chatbot++; else humano++;
+  }
+
+  return { total: sessions.length, chatbot, humano };
+}
+
 const DAY_ABBR = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']; // Date.getDay(): 0 = domingo
 function dayKey(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -329,6 +349,6 @@ function setResolutionThreshold(value) {
 module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb,
-  recordConversation, getMetrics, resetMetrics, getTimeseries,
+  recordConversation, getMetrics, resetMetrics, getTimeseries, getActiveSessions,
   getResolutionThreshold, setResolutionThreshold,
 };
