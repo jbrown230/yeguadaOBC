@@ -1,0 +1,74 @@
+{
+  "descripcion": "Catálogo de frases de prueba para el motor de clasificación de intenciones. Ninguna frase coincide con las frases de entrenamiento definidas en db.js.",
+  "en_dominio": [
+    { "frase": "me interesa agendar un recorrido para mi familia", "esperada": "booking.tour" },
+    { "frase": "se puede reservar para el próximo domingo", "esperada": "booking.tour" },
+    { "frase": "quiero separar espacio para cuatro personas en un tour", "esperada": "booking.tour" },
+    { "frase": "cómo hago para apartar una excursión", "esperada": "booking.tour" },
+    { "frase": "deseo reservar una caminata guiada", "esperada": "booking.tour" },
+
+    { "frase": "cuánto vale la entrada por persona", "esperada": "pricing.info" },
+    { "frase": "qué precio tiene el tour de las cascadas", "esperada": "pricing.info" },
+    { "frase": "hay descuento para estudiantes", "esperada": "pricing.info" },
+    { "frase": "cuánto me sale ir con mis hijos", "esperada": "pricing.info" },
+    { "frase": "me puede decir las tarifas por favor", "esperada": "pricing.info" },
+
+    { "frase": "tienen algún guía libre para el viernes", "esperada": "guide.availability" },
+    { "frase": "puedo ir acompañado de un guía local", "esperada": "guide.availability" },
+    { "frase": "los guías hablan inglés", "esperada": "guide.availability" },
+    { "frase": "necesito que alguien nos guíe por el sendero", "esperada": "guide.availability" },
+    { "frase": "hay guías disponibles en temporada de lluvia", "esperada": "guide.availability" },
+
+    { "frase": "qué se puede hacer allá", "esperada": "general.info" },
+    { "frase": "quiero saber más de la organización", "esperada": "general.info" },
+    { "frase": "qué tipo de actividades tienen para turistas", "esperada": "general.info" },
+    { "frase": "de qué se trata el ecoturismo en la yeguada", "esperada": "general.info" },
+    { "frase": "me cuentan qué ofrecen", "esperada": "general.info" },
+
+    { "frase": "por dónde queda la yeguada", "esperada": "location.directions" },
+    { "frase": "cómo llego en carro desde santiago", "esperada": "location.directions" },
+    { "frase": "qué bus tomo para llegar", "esperada": "location.directions" },
+    { "frase": "me pasan la ubicación por favor", "esperada": "location.directions" },
+    { "frase": "a cuántas horas está de la ciudad", "esperada": "location.directions" },
+
+    { "frase": "se permite llevar carpa", "esperada": "camping.info" },
+    { "frase": "hay lugar para quedarse a dormir", "esperada": "camping.info" },
+    { "frase": "el área de acampar tiene baños", "esperada": "camping.info" },
+    { "frase": "podemos acampar cerca de la laguna", "esperada": "camping.info" },
+    { "frase": "quiero hacer camping con amigos", "esperada": "camping.info" },
+
+    { "frase": "qué tan lejos está la cascada", "esperada": "waterfall.info" },
+    { "frase": "se puede nadar en las cascadas", "esperada": "waterfall.info" },
+    { "frase": "cómo es el camino a la silampa", "esperada": "waterfall.info" },
+    { "frase": "quiero conocer las cascadas celestes", "esperada": "waterfall.info" },
+    { "frase": "cuál cascada me recomiendan", "esperada": "waterfall.info" },
+
+    { "frase": "a qué hora salen los tours", "esperada": "hours.info" },
+    { "frase": "hasta qué hora se puede entrar", "esperada": "hours.info" },
+    { "frase": "abren los domingos", "esperada": "hours.info" },
+    { "frase": "a qué hora debo llegar", "esperada": "hours.info" },
+    { "frase": "qué horario manejan", "esperada": "hours.info" },
+
+    { "frase": "hola buenas noches", "esperada": "greeting" },
+    { "frase": "buenos días cómo están", "esperada": "greeting" },
+    { "frase": "hola qué tal", "esperada": "greeting" },
+    { "frase": "saludos desde costa rica", "esperada": "greeting" },
+    { "frase": "buenas tardes a todos", "esperada": "greeting" },
+
+    { "frase": "muchas gracias por la información", "esperada": "farewell" },
+    { "frase": "listo gracias", "esperada": "farewell" },
+    { "frase": "adiós que estén bien", "esperada": "farewell" },
+    { "frase": "hasta pronto", "esperada": "farewell" },
+    { "frase": "gracias por todo chao", "esperada": "farewell" }
+  ],
+  "fuera_de_dominio": [
+    "quiero cancelar mi reserva y que me devuelvan el dinero",
+    "tuve un problema con el guía y quiero poner una queja",
+    "aceptan pago con tarjeta de crédito",
+    "venden artesanías en la comunidad",
+    "cuál es el clima ahora mismo",
+    "necesito factura a nombre de mi empresa",
+    "me robaron en el parqueo",
+    "tienen señal de internet allá"
+  ]
+}

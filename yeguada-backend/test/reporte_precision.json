@@ -1,0 +1,183 @@
+{
+  "fecha": "2026-10-10T14:20:16.963Z",
+  "intenciones": 10,
+  "frasesEntrenamiento": 102,
+  "preguntasBaseConocimiento": 7,
+  "frasesPrueba": 50,
+  "precisionGlobal": 82,
+  "tasaResolucionAutomatica": 86,
+  "resueltasCorrectamente": 76,
+  "porIntencion": {
+    "booking.tour": {
+      "total": 5,
+      "correctas": 4,
+      "resueltas": 4,
+      "precision": 80
+    },
+    "pricing.info": {
+      "total": 5,
+      "correctas": 2,
+      "resueltas": 4,
+      "precision": 40
+    },
+    "guide.availability": {
+      "total": 5,
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
+    },
+    "general.info": {
+      "total": 5,
+      "correctas": 4,
+      "resueltas": 3,
+      "precision": 80
+    },
+    "location.directions": {
+      "total": 5,
+      "correctas": 4,
+      "resueltas": 5,
+      "precision": 80
+    },
+    "camping.info": {
+      "total": 5,
+      "correctas": 4,
+      "resueltas": 4,
+      "precision": 80
+    },
+    "waterfall.info": {
+      "total": 5,
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
+    },
+    "hours.info": {
+      "total": 5,
+      "correctas": 4,
+      "resueltas": 4,
+      "precision": 80
+    },
+    "greeting": {
+      "total": 5,
+      "correctas": 4,
+      "resueltas": 4,
+      "precision": 80
+    },
+    "farewell": {
+      "total": 5,
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
+    }
+  },
+  "errores": [
+    {
+      "frase": "deseo reservar una caminata guiada",
+      "esperada": "booking.tour",
+      "obtenida": "guide.availability",
+      "score": 0.8
+    },
+    {
+      "frase": "cuánto vale la entrada por persona",
+      "esperada": "pricing.info",
+      "obtenida": "location.directions",
+      "score": 0.91
+    },
+    {
+      "frase": "hay descuento para estudiantes",
+      "esperada": "pricing.info",
+      "obtenida": "general.info",
+      "score": 0.66
+    },
+    {
+      "frase": "cuánto me sale ir con mis hijos",
+      "esperada": "pricing.info",
+      "obtenida": "booking.tour",
+      "score": 0.89
+    },
+    {
+      "frase": "quiero saber más de la organización",
+      "esperada": "general.info",
+      "obtenida": "pricing.info",
+      "score": 0.65
+    },
+    {
+      "frase": "a cuántas horas está de la ciudad",
+      "esperada": "location.directions",
+      "obtenida": "hours.info",
+      "score": 0.95
+    },
+    {
+      "frase": "hay lugar para quedarse a dormir",
+      "esperada": "camping.info",
+      "obtenida": "None",
+      "score": 1
+    },
+    {
+      "frase": "abren los domingos",
+      "esperada": "hours.info",
+      "obtenida": "location.directions",
+      "score": 0.77
+    },
+    {
+      "frase": "saludos desde costa rica",
+      "esperada": "greeting",
+      "obtenida": "pricing.info",
+      "score": 0.51
+    }
+  ],
+  "fueraDeDominio": {
+    "total": 8,
+    "escaladas": 3,
+    "tasaEscalamiento": 37.5,
+    "detalle": [
+      {
+        "frase": "quiero cancelar mi reserva y que me devuelvan el dinero",
+        "obtenida": "None",
+        "score": 1,
+        "escalada": true
+      },
+      {
+        "frase": "tuve un problema con el guía y quiero poner una queja",
+        "obtenida": "guide.availability",
+        "score": 1,
+        "escalada": false
+      },
+      {
+        "frase": "aceptan pago con tarjeta de crédito",
+        "obtenida": "None",
+        "score": 1,
+        "escalada": true
+      },
+      {
+        "frase": "venden artesanías en la comunidad",
+        "obtenida": "camping.info",
+        "score": 0.97,
+        "escalada": false
+      },
+      {
+        "frase": "cuál es el clima ahora mismo",
+        "obtenida": "general.info",
+        "score": 0.89,
+        "escalada": false
+      },
+      {
+        "frase": "necesito factura a nombre de mi empresa",
+        "obtenida": "booking.tour",
+        "score": 0.66,
+        "escalada": true
+      },
+      {
+        "frase": "me robaron en el parqueo",
+        "obtenida": "camping.info",
+        "score": 1,
+        "escalada": false
+      },
+      {
+        "frase": "tienen señal de internet allá",
+        "obtenida": "pricing.info",
+        "score": 0.95,
+        "escalada": false
+      }
+    ]
+  }
+}
