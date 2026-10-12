@@ -25,6 +25,7 @@ app.use(express.json());
     if (!message) return res.status(400).json({ error: 'message requerido' });
 
     const result = await processMessage(message, sessionId, 'dashboard');
+    if (!result.resolved) whatsapp.notifyStaff({ message, channel: 'dashboard', sessionId }).catch(() => {});
     res.json(result);
   });
 
@@ -40,6 +41,7 @@ app.use(express.json());
       intentCounts: metrics.intentCounts,
       recentConversations: metrics.recentConversations,
       activeNow: db.getActiveSessions(),
+      pendingEscalations: db.getEscalations().length,
     });
   });
 
@@ -174,17 +176,24 @@ app.use(express.json());
 
   // ── Configuración — persistida en SQLite ──
 
-  // GET /api/config — Configuración actual (ej. umbral de confianza)
+  // GET /api/config — Configuración actual (umbral de confianza, número de staff)
   app.get('/api/config', (_, res) => {
-    res.json({ resolutionThreshold: db.getResolutionThreshold() });
+    res.json({
+      resolutionThreshold: db.getResolutionThreshold(),
+      staffWhatsappNumber: db.getStaffWhatsappNumber(),
+    });
   });
 
-  // PUT /api/config — Actualizar configuración
+  // PUT /api/config — Actualizar configuración (cada campo es opcional/independiente)
   app.put('/api/config', (req, res) => {
-    const { resolutionThreshold } = req.body;
+    const { resolutionThreshold, staffWhatsappNumber } = req.body;
     try {
-      const value = db.setResolutionThreshold(resolutionThreshold);
-      res.json({ resolutionThreshold: value });
+      if (resolutionThreshold !== undefined) db.setResolutionThreshold(resolutionThreshold);
+      if (staffWhatsappNumber !== undefined) db.setStaffWhatsappNumber(staffWhatsappNumber);
+      res.json({
+        resolutionThreshold: db.getResolutionThreshold(),
+        staffWhatsappNumber: db.getStaffWhatsappNumber(),
+      });
     } catch (err) {
       res.status(400).json({ error: err.message });
     }

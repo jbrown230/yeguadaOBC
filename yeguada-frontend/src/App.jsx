@@ -67,6 +67,8 @@ export default function App() {
         backendOnline={backendOnline}
         onMenuToggle={() => setSidebarOpen(o => !o)}
         onChatToggle={() => setChatOpen(o => !o)}
+        pendingEscalations={metrics.pendingEscalations || 0}
+        onNotifClick={() => handleNavigate('escalations')}
       />
       <div className="app-body">
         {anyOpen && <div className="drawer-overlay active" onClick={closeAll} />}

@@ -175,11 +175,11 @@ export async function fetchConfig() {
   return res.json();
 }
 
-export async function updateConfig({ resolutionThreshold }) {
+export async function updateConfig({ resolutionThreshold, staffWhatsappNumber }) {
   const res = await fetch(`${BASE}/config`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ resolutionThreshold }),
+    body: JSON.stringify({ resolutionThreshold, staffWhatsappNumber }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `Config error ${res.status}`);
