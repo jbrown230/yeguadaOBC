@@ -6,6 +6,7 @@ import ChatPanel from './components/ChatPanel';
 import Dashboard from './pages/Dashboard';
 import Intents from './pages/Intents';
 import KnowledgeBase from './pages/KnowledgeBase';
+import Escalations from './pages/Escalations';
 import Monitor from './pages/Monitor';
 import Config from './pages/Config';
 import { useMetrics } from './hooks/useMetrics';
@@ -18,6 +19,7 @@ const MainContent = memo(function MainContent({
       case 'dashboard': return <Dashboard metrics={metrics} />;
       case 'intents':   return <Intents metrics={metrics} />;
       case 'kb':        return <KnowledgeBase />;
+      case 'escalations': return <Escalations />;
       case 'monitor':   return <Monitor metrics={metrics} />;
       case 'config':    return <Config backendOnline={backendOnline} />;
       default:          return <Dashboard metrics={metrics} />;

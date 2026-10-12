@@ -77,6 +77,20 @@ export async function fetchConversationHistory(sessionId) {
   return res.json();
 }
 
+// ── Escalamientos a humano ────────────────────────────────────────────────────
+export async function fetchEscalations(all = false) {
+  const res = await fetch(`${BASE}/escalations${all ? '?all=true' : ''}`);
+  if (!res.ok) throw new Error(`Escalations error ${res.status}`);
+  return res.json();
+}
+
+export async function markEscalationHandled(id) {
+  const res = await fetch(`${BASE}/escalations/${id}/handle`, { method: 'PUT' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Escalations error ${res.status}`);
+  return data;
+}
+
 export async function fetchIntents() {
   const res = await fetch(`${BASE}/intents`);
   if (!res.ok) throw new Error(`Intents error ${res.status}`);
