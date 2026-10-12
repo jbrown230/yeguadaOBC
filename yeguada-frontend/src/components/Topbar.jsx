@@ -2,7 +2,7 @@
 import React from 'react';
 import Icon from './Icon';
 
-export default function Topbar({ backendOnline, onMenuToggle, onChatToggle }) {
+export default function Topbar({ backendOnline, onMenuToggle, onChatToggle, pendingEscalations = 0, onNotifClick }) {
   return (
     <header className="topbar">
       <div className="topbar-brand">
@@ -22,9 +22,14 @@ export default function Topbar({ backendOnline, onMenuToggle, onChatToggle }) {
           {backendOnline ? 'Backend conectado' : 'Modo demo'}
         </div>
 
-        <button className="icon-btn topbar-notif" aria-label="Notificaciones">
+        <button
+          className="icon-btn topbar-notif"
+          onClick={onNotifClick}
+          aria-label={pendingEscalations > 0 ? `${pendingEscalations} escalamientos pendientes` : 'Notificaciones'}
+          title={pendingEscalations > 0 ? `${pendingEscalations} escalamientos pendientes` : 'Sin escalamientos pendientes'}
+        >
           <Icon name="bell" size={18} />
-          <span className="dot-badge" />
+          {pendingEscalations > 0 && <span className="dot-badge" />}
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 4 }}>

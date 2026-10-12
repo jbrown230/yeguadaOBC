@@ -38,6 +38,8 @@ const Section = ({ title, children }) => (
 export default function Config({ backendOnline }) {
   const [threshold, setThreshold] = useState(70);
   const [savedThreshold, setSavedThreshold] = useState(70);
+  const [staffNumber, setStaffNumber] = useState('');
+  const [savedStaffNumber, setSavedStaffNumber] = useState('');
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -45,10 +47,12 @@ export default function Config({ backendOnline }) {
 
   const loadConfig = useCallback(async () => {
     try {
-      const { resolutionThreshold } = await fetchConfig();
+      const { resolutionThreshold, staffWhatsappNumber } = await fetchConfig();
       const pct = Math.round(resolutionThreshold * 100);
       setThreshold(pct);
       setSavedThreshold(pct);
+      setStaffNumber(staffWhatsappNumber || '');
+      setSavedStaffNumber(staffWhatsappNumber || '');
       setError(null);
     } catch {
       // backend offline al cargar — se queda con el valor por defecto
@@ -57,11 +61,14 @@ export default function Config({ backendOnline }) {
 
   useEffect(() => { loadConfig(); }, [loadConfig]);
 
+  const dirty = threshold !== savedThreshold || staffNumber !== savedStaffNumber;
+
   async function handleSave() {
     setSaving(true);
     try {
-      await updateConfig({ resolutionThreshold: threshold / 100 });
+      await updateConfig({ resolutionThreshold: threshold / 100, staffWhatsappNumber: staffNumber });
       setSavedThreshold(threshold);
+      setSavedStaffNumber(staffNumber);
       setError(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -74,6 +81,7 @@ export default function Config({ backendOnline }) {
 
   function handleCancel() {
     setThreshold(savedThreshold);
+    setStaffNumber(savedStaffNumber);
     setError(null);
   }
 
@@ -181,12 +189,26 @@ export default function Config({ backendOnline }) {
             <span>{opt.label}</span>
           </label>
         ))}
+
+        <div className="field" style={{ marginTop: 16 }}>
+          <label className="field-label">Número de WhatsApp del staff (notificaciones)</label>
+          <input
+            className="input"
+            type="tel"
+            value={staffNumber}
+            onChange={(e) => setStaffNumber(e.target.value)}
+            placeholder="ej: 50761234567 (con código de país, sin + ni espacios)"
+          />
+          <p style={{ fontSize: 11.5, color: 'var(--text-sec)', marginTop: 8 }}>
+            Cuando el bot escale una conversación (de WhatsApp o del chat de este dashboard), se le reenvía un aviso a este número por WhatsApp. Déjalo vacío para desactivar esta notificación. Requiere que el bot esté conectado (ver Integración WhatsApp arriba).
+          </p>
+        </div>
       </Section>
 
       {error && <p style={{ fontSize: 12, color: 'var(--danger)', textAlign: 'right', marginBottom: 10 }}>{error}</p>}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-        <button className="btn btn-secondary" onClick={handleCancel} disabled={saving || threshold === savedThreshold}>Cancelar</button>
-        <button onClick={handleSave} className={`btn btn-primary ${saved ? 'is-success' : ''}`} disabled={saving || threshold === savedThreshold}>
+        <button className="btn btn-secondary" onClick={handleCancel} disabled={saving || !dirty}>Cancelar</button>
+        <button onClick={handleSave} className={`btn btn-primary ${saved ? 'is-success' : ''}`} disabled={saving || !dirty}>
           {saving ? 'Guardando…' : saved ? 'Guardado' : 'Guardar Cambios'}
         </button>
       </div>

@@ -8,6 +8,7 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const QRCode = require('qrcode');
 const { processMessage } = require('./nlp');
+const db = require('./db');
 
 const AUTH_PATH = './.wwebjs_auth';
 
@@ -76,6 +77,7 @@ function buildClient() {
     try {
       const result = await processMessage(text, msg.from, 'whatsapp');
       await msg.reply(result.answer);
+      if (!result.resolved) notifyStaff({ message: text, channel: 'whatsapp', sessionId: msg.from }).catch(() => {});
     } catch (err) {
       console.error('Error procesando mensaje de WhatsApp:', err);
       await msg.reply('Lo siento, ocurrió un error procesando tu mensaje. Intenta nuevamente.');
@@ -83,6 +85,24 @@ function buildClient() {
   });
 
   return c;
+}
+
+// Avisa al staff por WhatsApp cuando el bot escala una conversación (de
+// cualquier canal, no solo WhatsApp). "Mejor esfuerzo": si no hay número
+// configurado o el bot no está conectado, no hace nada — nunca bloquea
+// ni rompe el flujo del chat que la originó.
+async function notifyStaff({ message, channel, sessionId }) {
+  if (!client || state.status !== 'connected') return;
+  const number = db.getStaffWhatsappNumber();
+  if (!number) return;
+
+  const origen = channel === 'whatsapp' ? `WhatsApp (${sessionId})` : channel;
+  const text = `🔔 Escalamiento pendiente — ${origen}:\n"${message}"\n\nRevisa el dashboard para más detalle.`;
+  try {
+    await client.sendMessage(`${number}@c.us`, text);
+  } catch (err) {
+    console.error('Error reenviando aviso de escalamiento al staff:', err.message);
+  }
 }
 
 // Inicia el cliente. Si ya existe sesión guardada en AUTH_PATH, se
@@ -142,4 +162,4 @@ function getStatus() {
   return { status: state.status, qr: state.qr, info: state.info };
 }
 
-module.exports = { connect, disconnect, reconnect, getStatus };
+module.exports = { connect, disconnect, reconnect, getStatus, notifyStaff };

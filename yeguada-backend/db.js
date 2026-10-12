@@ -391,10 +391,23 @@ function setResolutionThreshold(value) {
   return n;
 }
 
+// Número de WhatsApp del staff al que se le reenvía un aviso cuando el bot
+// escala una conversación. Vacío/null = notificación desactivada.
+function getStaffWhatsappNumber() {
+  return getSetting('staff_whatsapp_number', '') || null;
+}
+
+function setStaffWhatsappNumber(value) {
+  const digits = String(value || '').replace(/[^0-9]/g, '');
+  setSetting('staff_whatsapp_number', digits);
+  return digits || null;
+}
+
 module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb, getKbEntriesByIntent,
   recordConversation, getMetrics, resetMetrics, getTimeseries, getActiveSessions,
   getConversationsBySession, getEscalations, markEscalationHandled,
   getResolutionThreshold, setResolutionThreshold,
+  getStaffWhatsappNumber, setStaffWhatsappNumber,
 };
