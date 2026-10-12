@@ -6,6 +6,7 @@ const navItems = [
   { id: 'dashboard', label: 'Panel de Control',       icon: 'grid' },
   { id: 'intents',   label: 'Gestión de Intenciones', icon: 'target' },
   { id: 'kb',        label: 'Base de Conocimiento',   icon: 'book' },
+  { id: 'escalations', label: 'Escalamientos',         icon: 'users' },
   { id: 'monitor',   label: 'Monitoreo',               icon: 'activity' },
   { id: 'config',    label: 'Configuración',           icon: 'settings' },
 ];

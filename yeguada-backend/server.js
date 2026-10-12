@@ -145,6 +145,23 @@ app.use(express.json());
     res.json(db.getTimeseries());
   });
 
+  // ── Escalamientos a humano — cola de conversaciones que el bot no resolvió ──
+
+  // GET /api/escalations — Pendientes por defecto; ?all=true incluye ya atendidas
+  app.get('/api/escalations', (req, res) => {
+    res.json(db.getEscalations({ includeHandled: req.query.all === 'true' }));
+  });
+
+  // PUT /api/escalations/:id/handle — Marcar como atendida
+  app.put('/api/escalations/:id/handle', (req, res) => {
+    try {
+      db.markEscalationHandled(Number(req.params.id));
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(404).json({ error: err.message });
+    }
+  });
+
   // DELETE /api/metrics/reset — Borrar historial de conversaciones (llamado desde el botón Limpiar del frontend)
   app.delete('/api/metrics/reset', (_, res) => {
     db.resetMetrics();

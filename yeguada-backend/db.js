@@ -45,7 +45,9 @@ db.exec(`
     resolved INTEGER NOT NULL,
     answer TEXT,
     response_time_ms INTEGER,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    handled INTEGER NOT NULL DEFAULT 0,
+    handled_at TEXT
   );
   CREATE INDEX IF NOT EXISTS idx_conversations_created ON conversations(created_at);
 
@@ -54,6 +56,13 @@ db.exec(`
     value TEXT NOT NULL
   );
 `);
+
+// Migración: bases creadas antes de esta feature no tienen estas columnas.
+{
+  const cols = db.prepare("PRAGMA table_info(conversations)").all().map((c) => c.name);
+  if (!cols.includes('handled')) db.exec('ALTER TABLE conversations ADD COLUMN handled INTEGER NOT NULL DEFAULT 0');
+  if (!cols.includes('handled_at')) db.exec('ALTER TABLE conversations ADD COLUMN handled_at TEXT');
+}
 
 // ── Slug único a partir del nombre (ids legibles tipo 'booking.tour') ──
 function slugify(name) {
@@ -265,6 +274,25 @@ function resetMetrics() {
   db.prepare('DELETE FROM conversations').run();
 }
 
+// ── Cola de escalamientos a humano ──
+// Conversaciones donde el bot no resolvió (resolved = 0). `handled` marca
+// si un humano ya le dio seguimiento (por WhatsApp, en persona, etc.) —
+// no hay integración real con un canal humano todavía, es solo el registro.
+function getEscalations({ includeHandled = false } = {}) {
+  const where = includeHandled ? 'resolved = 0' : 'resolved = 0 AND handled = 0';
+  return db.prepare(`
+    SELECT id, session_id AS sessionId, channel, message, intent, score, answer,
+           created_at AS time, handled, handled_at AS handledAt
+    FROM conversations WHERE ${where} ORDER BY id DESC
+  `).all().map((r) => ({ ...r, handled: !!r.handled }));
+}
+
+function markEscalationHandled(id) {
+  const result = db.prepare("UPDATE conversations SET handled = 1, handled_at = ? WHERE id = ? AND resolved = 0")
+    .run(new Date().toISOString(), id);
+  if (result.changes === 0) throw new Error(`Conversación '${id}' no encontrada o no estaba escalada`);
+}
+
 // Historial completo de una sesión (para el botón "Ver detalles" del Dashboard).
 function getConversationsBySession(sessionId) {
   return db.prepare(`
@@ -367,6 +395,6 @@ module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb, getKbEntriesByIntent,
   recordConversation, getMetrics, resetMetrics, getTimeseries, getActiveSessions,
-  getConversationsBySession,
+  getConversationsBySession, getEscalations, markEscalationHandled,
   getResolutionThreshold, setResolutionThreshold,
 };
