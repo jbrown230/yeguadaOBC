@@ -78,19 +78,19 @@ function seedIfEmpty() {
 
   const SEED_INTENTS = [
     { id: 'booking.tour', name: 'Reserva de Tours',
-      examples: ['quiero reservar un tour', 'cómo puedo hacer una reserva', 'me gustaría reservar', 'quiero hacer un tour', 'reservar para el fin de semana', 'quisiera apartar un cupo', 'cómo reservo para un grupo', 'quiero apartar un tour para el sábado', 'proceso de reserva', 'quiero ir a la yeguada', 'tour', 'tours', 'reserva', 'reservas', 'reservar', 'quiero un tour'],
+      examples: ['quiero reservar un tour', 'cómo puedo hacer una reserva', 'me gustaría reservar', 'quiero hacer un tour', 'reservar para el fin de semana', 'quisiera apartar un cupo', 'cómo reservo para un grupo', 'quiero apartar un tour para el sábado', 'proceso de reserva', 'quiero ir a la yeguada', 'tour', 'tours', 'reserva', 'reservas', 'reservar', 'quiero un tour', 'necesito información sobre un tour', 'me interesa agendar un recorrido'],
       answer: 'Para reservar un tour en La Yeguada OBC, contáctenos por WhatsApp al +507 6XXX-XXXX o escríbanos al correo info@ecoturismolayeguada.com. Ofrecemos tours guiados de senderismo, cascadas y agroturismo. Se recomienda reservar con 48h de anticipación. ¿Le gustaría saber más sobre algún tour en específico?' },
     { id: 'pricing.info', name: 'Precios y Tarifas',
-      examples: ['cuánto cuesta el tour', 'cuál es el precio', 'qué tarifa tienen', 'precio de las actividades', 'cuánto cobran', 'costo de entrada', 'tienen algún descuento', 'precio para niños', 'tarifa grupal', 'precio', 'precios', 'costo', 'costos', 'tarifa', 'tarifas'],
+      examples: ['cuánto cuesta el tour', 'cuál es el precio', 'qué tarifa tienen', 'precio de las actividades', 'cuánto cobran', 'costo de entrada', 'tienen algún descuento', 'precio para niños', 'tarifa grupal', 'precio', 'precios', 'costo', 'costos', 'tarifa', 'tarifas', 'cuánto vale la entrada', 'valor de la entrada por persona', 'tienen descuento para estudiantes', 'hacen descuento a grupos de estudiantes', 'cuánto cuesta llevar a los niños', 'precio incluyendo a mis hijos'],
       answer: '💰 Nuestros precios son:\n🥾 Tour Senderismo Básico: $25/persona\n🌊 Tour Cascadas Celestes: $35/persona\n🌿 Tour Completo (cascadas + almuerzo típico): $45/persona\n\nGrupos de 8+ personas tienen descuento especial del 15%. Niños menores de 6 años gratuitos. ¿Desea información de algún tour específico?' },
     { id: 'guide.availability', name: 'Disponibilidad de Guía',
       examples: ['hay guías disponibles', 'necesito un guía', 'cuándo está disponible el guía', 'tienen guía en español', 'disponibilidad de guías', 'guías certificados', 'quiero contratar un guía', 'guía', 'guías', 'guia', 'guias'],
       answer: '🧭 Contamos con guías comunitarios certificados. La disponibilidad varía según la temporada:\n🌅 Temporada alta (dic-abr): reserve con 1 semana de anticipación\n🌧️ Temporada baja (may-nov): mayor disponibilidad\n\nTodos nuestros guías son locales y conocen la flora, fauna y tradiciones del lugar. ¿Para qué fecha necesita el servicio?' },
     { id: 'general.info', name: 'Información General',
-      examples: ['qué actividades ofrecen', 'qué hay para hacer en la yeguada', 'información sobre ecoturismo la yeguada', 'qué es ecoturismo la yeguada obc', 'qué experiencias tienen', 'cuéntame sobre la yeguada', 'información', 'info', 'actividades', 'ecoturismo'],
+      examples: ['qué actividades ofrecen', 'qué hay para hacer en la yeguada', 'información sobre ecoturismo la yeguada', 'qué es ecoturismo la yeguada obc', 'qué experiencias tienen', 'cuéntame sobre la yeguada', 'información', 'info', 'actividades', 'ecoturismo', 'quiero conocer más sobre ustedes', 'cuéntenme más de la organización'],
       answer: '🌿 Ecoturismo La Yeguada OBC es una organización de base comunitaria ubicada en la Reserva Forestal La Yeguada, Calobre, Veraguas, Panamá.\n\nOfrecemos:\n🥾 Senderismo interpretativo\n🌊 Visita a Cascadas Celestes\n🛶 Kayak en la Laguna volcánica\n🌱 Agroturismo y café\n🦜 Avistamiento de aves (200+ especies)\n⛺ Camping\n🎭 Talleres culturales comunitarios\n\n¿Le interesa alguna actividad en particular?' },
     { id: 'location.directions', name: 'Cómo Llegar',
-      examples: ['cómo llego a la yeguada', 'dónde queda la reserva', 'cómo llegar desde ciudad de panamá', 'dirección de la reserva forestal', 'ubicación de la yeguada', 'cómo se llega en bus', 'cuánto tarda el viaje', 'ubicación', 'dirección', 'llegar', 'cómo llegar'],
+      examples: ['cómo llego a la yeguada', 'dónde queda la reserva', 'cómo llegar desde ciudad de panamá', 'dirección de la reserva forestal', 'ubicación de la yeguada', 'cómo se llega en bus', 'cuánto tarda el viaje', 'ubicación', 'dirección', 'llegar', 'cómo llegar', 'a cuántas horas está de la ciudad'],
       answer: '📍 La Reserva Forestal La Yeguada está en Calobre, Veraguas.\n\n🚗 En carro: Carretera Interamericana → desvío en El Jagüito → Calobre → La Yeguada (~260 km, 4-5 horas desde Ciudad de Panamá). Se recomienda vehículo 4x4.\n\n🚌 En bus: Terminal Albrook → Aguadulce → bus local a La Yeguada (~6 horas).\n\n¿Necesita más detalles sobre el recorrido?' },
     { id: 'camping.info', name: 'Camping',
       examples: ['puedo acampar ahí', 'tienen área de camping', 'quiero acampar en la yeguada', 'pasar la noche en la reserva', 'se puede dormir en carpas', 'camping', 'acampar', 'carpa'],
@@ -99,7 +99,7 @@ function seedIfEmpty() {
       examples: ['dónde están las cascadas celestes', 'información sobre las cascadas', 'la silampa cascada', 'quiero ver las cascadas', 'tour a las cascadas', 'cascada', 'cascadas', 'silampa'],
       answer: '🌊 Contamos con dos cascadas principales:\n\n💧 Cascadas Celestes: sendero de ~45 min, acceso en 4x4. Incluida en tour $35.\n💧 Cascada La Silampa: caminata de ~1h45 min, paisaje espectacular con cueva. Guía recomendado.\n\nAmbas son impresionantes y perfectas para fotografía y natación en los meses secos.' },
     { id: 'hours.info', name: 'Horarios',
-      examples: ['cuál es el horario de atención', 'a qué hora abren', 'cuándo puedo visitar', 'horario de los tours', 'horario', 'horarios', 'hora'],
+      examples: ['cuál es el horario de atención', 'a qué hora abren', 'cuándo puedo visitar', 'horario de los tours', 'horario', 'horarios', 'hora', 'abren los domingos', 'atienden los fines de semana'],
       answer: '⏰ Horarios:\n📅 Atención: lun-dom (vía WhatsApp en horario de oficina)\n🌅 Tours: salen a las 7:00-8:00 AM\n🏞️ Acceso reserva: 7:30 AM - 4:30 PM\n\nSe recomienda llegar temprano para aprovechar el día completo.' },
     { id: 'greeting', name: 'Saludos',
       examples: ['hola', 'buenos días', 'buenas tardes', 'buenas', 'hey', 'buen día', 'qué tal', 'saludos'],
@@ -107,6 +107,9 @@ function seedIfEmpty() {
     { id: 'farewell', name: 'Despedidas',
       examples: ['gracias', 'muchas gracias', 'hasta luego', 'adiós', 'chao', 'nos vemos', 'bye'],
       answer: '¡Con mucho gusto! 🌿 Esperamos verle pronto en la Reserva Forestal La Yeguada. Para cualquier consulta adicional, estamos disponibles por WhatsApp. ¡Que tenga un excelente día!' },
+    { id: 'fuera.de.alcance', name: 'Fuera de Alcance',
+      examples: ['quiero poner una queja', 'tengo un reclamo sobre el servicio', 'no quedé conforme con el tour', 'quiero cancelar y que me devuelvan el dinero', 'puedo pedir un reembolso', 'puedo pagar con tarjeta de crédito', 'aceptan pago en línea', 'hacen factura electrónica', 'cómo está el clima para ir', 'va a llover esta semana', 'cómo va a estar el clima', 'tuve un problema de seguridad', 'hubo un robo durante la visita', 'necesito reportar un incidente', 'hay señal de celular en la zona', 'hay wifi disponible', 'tienen internet', 'venden souvenirs o artesanías', 'hay tienda de recuerdos'],
+      answer: 'Esta consulta no la puedo resolver automáticamente. Te conectaré con un operador humano.' },
   ];
 
   const SEED_KB = [
