@@ -196,6 +196,12 @@ function listKb() {
   return db.prepare('SELECT * FROM kb_entries ORDER BY created_at DESC').all().map(rowToKb);
 }
 
+// Entradas de KB ligadas a una intención — para que processMessage() en
+// nlp.js busque una respuesta puntual más específica que la genérica.
+function getKbEntriesByIntent(intentId) {
+  return db.prepare('SELECT * FROM kb_entries WHERE intent_id = ?').all(intentId).map(rowToKb);
+}
+
 function createKb({ intentId, question, answer, tags }) {
   const result = db.prepare('INSERT INTO kb_entries (intent_id, question, answer, tags) VALUES (?, ?, ?, ?)')
     .run(intentId || null, question, answer, JSON.stringify(tags || []));
@@ -359,7 +365,7 @@ function setResolutionThreshold(value) {
 
 module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
-  listKb, createKb, updateKb, deleteKb,
+  listKb, createKb, updateKb, deleteKb, getKbEntriesByIntent,
   recordConversation, getMetrics, resetMetrics, getTimeseries, getActiveSessions,
   getConversationsBySession,
   getResolutionThreshold, setResolutionThreshold,

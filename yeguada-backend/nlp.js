@@ -6,12 +6,52 @@
 // (SQLite) — se cargan aquí cada vez que se entrena el modelo.
 // ─────────────────────────────────────────────────────────────
 const { NlpManager } = require('node-nlp');
+const { StemmerEs, StopwordsEs, TokenizerEs } = require('@nlpjs/lang-es');
 const db = require('./db');
 
 // Reasignado por completo en cada trainModel() — nunca se muta en caliente.
 let manager = new NlpManager({ languages: ['es'], forceNER: true });
 
 const ESCALATION_MESSAGE = '🔄 Esta consulta requiere atención personalizada. Te conectaré con un operador humano en breve. También puedes escribirnos directamente al WhatsApp +507 6XXX-XXXX.';
+
+// ── Respuestas puntuales de la Base de Conocimiento ──
+// Una vez que el clasificador principal ya resolvió la intención (sin tocar
+// ese modelo), buscamos entre las entradas de KB ligadas a esa intención
+// la más parecida al mensaje del usuario (stems en español + sin stopwords,
+// reutilizando el mismo motor que ya trae node-nlp). Si hay una suficientemente
+// cercana, usamos su respuesta puntual; si no, se usa la respuesta genérica
+// de la intención (comportamiento anterior).
+const stemmerContainer = { get: () => undefined, register: () => {} };
+const stemmer = new StemmerEs(stemmerContainer);
+stemmer.tokenizer = new TokenizerEs(stemmerContainer);
+stemmer.stopwords = new StopwordsEs(stemmerContainer);
+const KB_MATCH_THRESHOLD = 0.4;
+
+function stemSet(text) {
+  return new Set(stemmer.tokenizeAndStem(text, false));
+}
+
+function wordOverlap(a, b) {
+  const setA = stemSet(a);
+  const setB = stemSet(b);
+  if (setA.size === 0 || setB.size === 0) return 0;
+  let intersection = 0;
+  for (const w of setA) if (setB.has(w)) intersection++;
+  return intersection / new Set([...setA, ...setB]).size;
+}
+
+// Entre las entradas de KB de `intentId`, la más parecida a `message` (si
+// supera el umbral). Devuelve su respuesta puntual o null.
+function findKbAnswer(intentId, message) {
+  let best = null;
+  for (const entry of db.getKbEntriesByIntent(intentId)) {
+    const score = wordOverlap(message, entry.question);
+    if (score >= KB_MATCH_THRESHOLD && (!best || score > best.score)) {
+      best = { answer: entry.answer, score };
+    }
+  }
+  return best;
+}
 
 // Reconstruye el manager desde cero con las intenciones actuales de la BD
 // y lo entrena. Se llama al arrancar el servidor y después de cualquier
@@ -62,6 +102,12 @@ async function processMessage(message, sessionId, channel = 'dashboard') {
   const resolved = response.intent !== 'None' && response.intent !== 'fuera.de.alcance'
     && response.score >= db.getResolutionThreshold();
 
+  let answer = resolved ? response.answer : ESCALATION_MESSAGE;
+  if (resolved) {
+    const kbMatch = findKbAnswer(response.intent, message);
+    if (kbMatch) answer = kbMatch.answer;
+  }
+
   db.recordConversation({
     sessionId,
     channel,
@@ -69,14 +115,14 @@ async function processMessage(message, sessionId, channel = 'dashboard') {
     intent: response.intent,
     score: response.score,
     resolved,
-    answer: response.answer,
+    answer,
     responseTimeMs: elapsed,
   });
 
   return {
     intent: response.intent,
     score: response.score,
-    answer: resolved ? response.answer : ESCALATION_MESSAGE,
+    answer,
     resolved,
     escalated: !resolved,
     responseTimeMs: elapsed,
