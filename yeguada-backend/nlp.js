@@ -55,7 +55,12 @@ async function processMessage(message, sessionId, channel = 'dashboard') {
   // node-nlp devuelve intent 'None' con score 1 (no un score bajo en la intención
   // más cercana) cuando ninguna intención entrenada supera su umbral interno.
   // Sin este chequeo, 'None' se contaba como resuelto pero sin `answer` real.
-  const resolved = response.intent !== 'None' && response.score >= db.getResolutionThreshold();
+  // 'fuera.de.alcance' es una intención entrenada a propósito (quejas, pagos,
+  // clima, robos, señal/wifi, artesanías) para que el bot la reconozca con
+  // confianza y escale, en vez de adivinar una intención real por solapamiento
+  // de vocabulario. Su id lo generó slugify() a partir del nombre en db.js.
+  const resolved = response.intent !== 'None' && response.intent !== 'fuera.de.alcance'
+    && response.score >= db.getResolutionThreshold();
 
   db.recordConversation({
     sessionId,

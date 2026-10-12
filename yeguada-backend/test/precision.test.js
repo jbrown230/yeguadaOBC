@@ -14,7 +14,12 @@ const { NlpManager } = require('node-nlp');
 const db = require('../db');
 const catalogo = require('./frases_prueba.json');
 
-const RESOLUTION_THRESHOLD = 0.7; // mismo umbral que nlp.js
+// Mismos criterios que processMessage() en nlp.js — si esto se desalinea,
+// la prueba mide un comportamiento que ya no es el real.
+const RESOLUTION_THRESHOLD = db.getResolutionThreshold();
+function esResuelta(r) {
+  return r.intent !== 'None' && r.intent !== 'fuera.de.alcance' && r.score >= RESOLUTION_THRESHOLD;
+}
 
 async function main() {
   // Misma configuración que nlp.js; solo se desactivan el guardado y el registro de épocas en consola.
@@ -37,7 +42,7 @@ async function main() {
   const errores = [];
   for (const { frase, esperada } of catalogo.en_dominio) {
     const r = await manager.process('es', frase);
-    const resuelta = r.intent !== 'None' && r.score >= RESOLUTION_THRESHOLD;
+    const resuelta = esResuelta(r);
     const ok = r.intent === esperada;
     porIntencion[esperada] ??= { total: 0, correctas: 0, resueltas: 0 };
     porIntencion[esperada].total++;
@@ -51,7 +56,7 @@ async function main() {
   const fuera = [];
   for (const frase of catalogo.fuera_de_dominio) {
     const r = await manager.process('es', frase);
-    const resuelta = r.intent !== 'None' && r.score >= RESOLUTION_THRESHOLD;
+    const resuelta = esResuelta(r);
     if (!resuelta) escaladas++;
     fuera.push({ frase, obtenida: r.intent, score: Number(r.score.toFixed(2)), escalada: !resuelta });
   }
