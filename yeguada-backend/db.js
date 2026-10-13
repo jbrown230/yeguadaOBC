@@ -274,6 +274,15 @@ function resetMetrics() {
   db.prepare('DELETE FROM conversations').run();
 }
 
+// Historial completo de conversaciones (todas, no solo las últimas 20 de
+// getMetrics()) — para la tabla paginada del Dashboard.
+function listConversations() {
+  return db.prepare(`
+    SELECT id, session_id AS sessionId, channel, message, intent, score, resolved, answer, created_at AS time
+    FROM conversations ORDER BY id DESC
+  `).all().map((r) => ({ ...r, resolved: !!r.resolved }));
+}
+
 // ── Cola de escalamientos a humano ──
 // Conversaciones donde el bot no resolvió (resolved = 0). `handled` marca
 // si un humano ya le dio seguimiento (por WhatsApp, en persona, etc.) —
@@ -391,23 +400,33 @@ function setResolutionThreshold(value) {
   return n;
 }
 
-// Número de WhatsApp del staff al que se le reenvía un aviso cuando el bot
-// escala una conversación. Vacío/null = notificación desactivada.
-function getStaffWhatsappNumber() {
-  return getSetting('staff_whatsapp_number', '') || null;
+// Números de WhatsApp del staff a los que se les reenvía un aviso cuando el
+// bot escala una conversación. Lista vacía = notificación desactivada.
+function sanitizeNumber(value) {
+  return String(value || '').replace(/[^0-9]/g, '');
 }
 
-function setStaffWhatsappNumber(value) {
-  const digits = String(value || '').replace(/[^0-9]/g, '');
-  setSetting('staff_whatsapp_number', digits);
-  return digits || null;
+function getStaffWhatsappNumbers() {
+  const raw = getSetting('staff_whatsapp_numbers', null);
+  if (raw) {
+    try { return JSON.parse(raw); } catch { /* corrupto, se reconstruye abajo */ }
+  }
+  // Migración desde la versión anterior (un solo número).
+  const legacy = sanitizeNumber(getSetting('staff_whatsapp_number', ''));
+  return legacy ? [legacy] : [];
+}
+
+function setStaffWhatsappNumbers(values) {
+  const list = [...new Set((Array.isArray(values) ? values : [values]).map(sanitizeNumber).filter(Boolean))];
+  setSetting('staff_whatsapp_numbers', JSON.stringify(list));
+  return list;
 }
 
 module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb, getKbEntriesByIntent,
   recordConversation, getMetrics, resetMetrics, getTimeseries, getActiveSessions,
-  getConversationsBySession, getEscalations, markEscalationHandled,
+  getConversationsBySession, listConversations, getEscalations, markEscalationHandled,
   getResolutionThreshold, setResolutionThreshold,
-  getStaffWhatsappNumber, setStaffWhatsappNumber,
+  getStaffWhatsappNumbers, setStaffWhatsappNumbers,
 };

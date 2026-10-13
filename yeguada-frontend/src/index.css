@@ -576,6 +576,12 @@ input[type="range"] { accent-color: var(--accent); width: 100%; }
   margin-top: 18px; padding-bottom: 4px; font-family: var(--font-mono);
 }
 
+.pagination {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  margin-top: 14px;
+}
+.pagination-info { font-size: var(--fs-xs); color: var(--text-ter); white-space: nowrap; }
+
 .callout {
   padding: 12px 14px; border-radius: var(--r-md);
   background: var(--accent-soft); color: var(--accent-strong);

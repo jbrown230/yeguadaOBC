@@ -13,6 +13,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Pagina un array ya cargado en memoria — suficiente para el volumen de
+// datos de este proyecto, evita repetir LIMIT/OFFSET en cada query SQL.
+function paginate(items, { page, pageSize } = {}) {
+  const p = Math.max(1, Number(page) || 1);
+  const size = Math.max(1, Number(pageSize) || 20);
+  const total = items.length;
+  const totalPages = Math.max(1, Math.ceil(total / size));
+  const start = (p - 1) * size;
+  return { items: items.slice(start, start + size), total, page: p, pageSize: size, totalPages };
+}
+
 // ── Entrenar y levantar servidor ──
 (async () => {
   await trainModel();
@@ -45,7 +56,12 @@ app.use(express.json());
     });
   });
 
-  // GET /api/conversations/:sessionId — Historial completo de una sesión
+  // GET /api/conversations — Historial completo, paginado (?page=&pageSize=)
+  app.get('/api/conversations', (req, res) => {
+    res.json(paginate(db.listConversations(), req.query));
+  });
+
+  // GET /api/conversations/:sessionId — Historial completo de una sesión (sin paginar — es chico)
   app.get('/api/conversations/:sessionId', (req, res) => {
     res.json(db.getConversationsBySession(req.params.sessionId));
   });
@@ -149,9 +165,10 @@ app.use(express.json());
 
   // ── Escalamientos a humano — cola de conversaciones que el bot no resolvió ──
 
-  // GET /api/escalations — Pendientes por defecto; ?all=true incluye ya atendidas
+  // GET /api/escalations — Pendientes por defecto; ?all=true incluye ya atendidas; paginado (?page=&pageSize=)
   app.get('/api/escalations', (req, res) => {
-    res.json(db.getEscalations({ includeHandled: req.query.all === 'true' }));
+    const all = db.getEscalations({ includeHandled: req.query.all === 'true' });
+    res.json(paginate(all, req.query));
   });
 
   // PUT /api/escalations/:id/handle — Marcar como atendida
@@ -176,23 +193,23 @@ app.use(express.json());
 
   // ── Configuración — persistida en SQLite ──
 
-  // GET /api/config — Configuración actual (umbral de confianza, número de staff)
+  // GET /api/config — Configuración actual (umbral de confianza, números de staff)
   app.get('/api/config', (_, res) => {
     res.json({
       resolutionThreshold: db.getResolutionThreshold(),
-      staffWhatsappNumber: db.getStaffWhatsappNumber(),
+      staffWhatsappNumbers: db.getStaffWhatsappNumbers(),
     });
   });
 
   // PUT /api/config — Actualizar configuración (cada campo es opcional/independiente)
   app.put('/api/config', (req, res) => {
-    const { resolutionThreshold, staffWhatsappNumber } = req.body;
+    const { resolutionThreshold, staffWhatsappNumbers } = req.body;
     try {
       if (resolutionThreshold !== undefined) db.setResolutionThreshold(resolutionThreshold);
-      if (staffWhatsappNumber !== undefined) db.setStaffWhatsappNumber(staffWhatsappNumber);
+      if (staffWhatsappNumbers !== undefined) db.setStaffWhatsappNumbers(staffWhatsappNumbers);
       res.json({
         resolutionThreshold: db.getResolutionThreshold(),
-        staffWhatsappNumber: db.getStaffWhatsappNumber(),
+        staffWhatsappNumbers: db.getStaffWhatsappNumbers(),
       });
     } catch (err) {
       res.status(400).json({ error: err.message });

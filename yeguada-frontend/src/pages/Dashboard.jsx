@@ -6,9 +6,11 @@ import {
 } from 'recharts';
 import KpiCard from '../components/Kpicard';
 import Icon from '../components/Icon';
-import { fetchTimeseries, fetchConversationHistory } from '../services/api';
+import Pagination from '../components/Pagination';
+import { fetchTimeseries, fetchConversationHistory, fetchConversations } from '../services/api';
 
 const PIE_COLORS = ['#396B2C', '#FFA700', '#8A5A12', '#7B8190', '#A3312A', '#454A54'];
+const CONV_PAGE_SIZE = 10;
 
 export default function Dashboard({ metrics }) {
   const [range, setRange] = useState('week');
@@ -16,6 +18,35 @@ export default function Dashboard({ metrics }) {
   const [selectedSession, setSelectedSession] = useState(null);
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+
+  const [convPage, setConvPage] = useState(1);
+  const [convItems, setConvItems] = useState([]);
+  const [convTotal, setConvTotal] = useState(0);
+  const [convTotalPages, setConvTotalPages] = useState(1);
+  const [convLoading, setConvLoading] = useState(true);
+
+  const loadConversations = useCallback(async (page) => {
+    try {
+      const data = await fetchConversations({ page, pageSize: CONV_PAGE_SIZE });
+      setConvItems(data.items);
+      setConvTotal(data.total);
+      setConvTotalPages(data.totalPages);
+    } catch { /* backend offline — deja los datos anteriores */ } finally {
+      setConvLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadConversations(convPage); }, [convPage, loadConversations]);
+
+  useEffect(() => {
+    const handler = () => loadConversations(convPage);
+    const interval = setInterval(handler, 30000);
+    window.addEventListener('yeguada:metrics:updated', handler);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('yeguada:metrics:updated', handler);
+    };
+  }, [convPage, loadConversations]);
 
   async function openDetails(sessionId) {
     setSelectedSession(sessionId);
@@ -149,10 +180,10 @@ export default function Dashboard({ metrics }) {
               </tr>
             </thead>
             <tbody>
-              {metrics.recentConversations.length === 0 && (
+              {!convLoading && convItems.length === 0 && (
                 <tr><td colSpan={6}><div className="empty-state">Sin conversaciones registradas todavía.</div></td></tr>
               )}
-              {metrics.recentConversations.map((c, i) => {
+              {convItems.map((c, i) => {
                 const initials = (c.sessionId || 'U').slice(0, 2).toUpperCase();
                 const time = new Date(c.time).toLocaleString('es', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
                 return (
@@ -189,6 +220,7 @@ export default function Dashboard({ metrics }) {
             </tbody>
           </table>
         </div>
+        <Pagination page={convPage} totalPages={convTotalPages} total={convTotal} onPageChange={setConvPage} disabled={convLoading} />
       </div>
 
       {/* Modal — historial de la sesión */}

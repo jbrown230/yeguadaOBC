@@ -93,16 +93,19 @@ function buildClient() {
 // ni rompe el flujo del chat que la originó.
 async function notifyStaff({ message, channel, sessionId }) {
   if (!client || state.status !== 'connected') return;
-  const number = db.getStaffWhatsappNumber();
-  if (!number) return;
+  const numbers = db.getStaffWhatsappNumbers();
+  if (numbers.length === 0) return;
 
   const origen = channel === 'whatsapp' ? `WhatsApp (${sessionId})` : channel;
   const text = `🔔 Escalamiento pendiente — ${origen}:\n"${message}"\n\nRevisa el dashboard para más detalle.`;
-  try {
-    await client.sendMessage(`${number}@c.us`, text);
-  } catch (err) {
-    console.error('Error reenviando aviso de escalamiento al staff:', err.message);
-  }
+  // En paralelo — si un número falla (inválido, etc.) no debe impedir avisar a los demás.
+  await Promise.allSettled(numbers.map(async (number) => {
+    try {
+      await client.sendMessage(`${number}@c.us`, text);
+    } catch (err) {
+      console.error(`Error reenviando aviso de escalamiento a ${number}:`, err.message);
+    }
+  }));
 }
 
 // Inicia el cliente. Si ya existe sesión guardada en AUTH_PATH, se
