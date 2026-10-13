@@ -2,8 +2,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { fetchIntents, createIntent, updateIntent, deleteIntent } from '../services/api';
 import Icon from '../components/Icon';
+import Pagination from '../components/Pagination';
+import { usePagination } from '../hooks/usePagination';
 
 const EMPTY_FORM = { name: '', answer: '', examples: '' };
+const PAGE_SIZE = 6;
 
 export default function Intents({ metrics }) {
   const [intents, setIntents] = useState([]);
@@ -75,6 +78,7 @@ export default function Intents({ metrics }) {
   }
 
   const intentCounts = metrics?.intentCounts || {};
+  const { page, totalPages, setPage, pageItems } = usePagination(intents, PAGE_SIZE);
 
   return (
     <div className="page-enter">
@@ -124,8 +128,9 @@ export default function Intents({ metrics }) {
       {loading ? (
         <div className="loading-state"><div className="spinner" /></div>
       ) : (
+        <>
         <div className="intent-grid">
-          {intents.map((intent) => {
+          {pageItems.map((intent) => {
             const count = intentCounts[intent.id] || 0;
             return (
               <div key={intent.id} className="panel panel-pad">
@@ -162,6 +167,8 @@ export default function Intents({ metrics }) {
             );
           })}
         </div>
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        </>
       )}
     </div>
   );

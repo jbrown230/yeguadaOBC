@@ -2,8 +2,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { fetchKb, createKbEntry, updateKbEntry, deleteKbEntry, fetchIntents } from '../services/api';
 import Icon from '../components/Icon';
+import Pagination from '../components/Pagination';
+import { usePagination } from '../hooks/usePagination';
 
 const EMPTY_FORM = { intentId: '', question: '', answer: '', tags: '' };
+const PAGE_SIZE = 5;
 
 export default function KnowledgeBase() {
   const [entries, setEntries] = useState([]);
@@ -36,6 +39,7 @@ export default function KnowledgeBase() {
     e.answer.toLowerCase().includes(search.toLowerCase()) ||
     e.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()))
   );
+  const { page, totalPages, setPage, pageItems } = usePagination(filtered, PAGE_SIZE);
 
   function startAdd() {
     setForm({ ...EMPTY_FORM, intentId: intents[0]?.id || '' });
@@ -161,7 +165,7 @@ export default function KnowledgeBase() {
             {filtered.length === 0 && (
               <div className="empty-state">No se encontraron resultados para "{search}"</div>
             )}
-            {filtered.map((entry) => (
+            {pageItems.map((entry) => (
               <div key={entry.id} className="panel panel-pad">
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -194,6 +198,7 @@ export default function KnowledgeBase() {
           <div className="mono" style={{ marginTop: 14, fontSize: 11, color: 'var(--text-ter)', textAlign: 'right' }}>
             {filtered.length} de {entries.length} entradas
           </div>
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         </>
       )}
     </div>

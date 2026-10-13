@@ -77,9 +77,11 @@ export async function fetchConversationHistory(sessionId) {
   return res.json();
 }
 
-// ── Escalamientos a humano ────────────────────────────────────────────────────
-export async function fetchEscalations(all = false) {
-  const res = await fetch(`${BASE}/escalations${all ? '?all=true' : ''}`);
+// ── Escalamientos a humano (paginado del lado del backend) ───────────────────
+export async function fetchEscalations({ all = false, page = 1, pageSize = 20 } = {}) {
+  const params = new URLSearchParams({ page, pageSize });
+  if (all) params.set('all', 'true');
+  const res = await fetch(`${BASE}/escalations?${params}`);
   if (!res.ok) throw new Error(`Escalations error ${res.status}`);
   return res.json();
 }
@@ -89,6 +91,14 @@ export async function markEscalationHandled(id) {
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `Escalations error ${res.status}`);
   return data;
+}
+
+// ── Historial completo de conversaciones (paginado del lado del backend) ─────
+export async function fetchConversations({ page = 1, pageSize = 20 } = {}) {
+  const params = new URLSearchParams({ page, pageSize });
+  const res = await fetch(`${BASE}/conversations?${params}`);
+  if (!res.ok) throw new Error(`Conversations error ${res.status}`);
+  return res.json();
 }
 
 export async function fetchIntents() {
@@ -175,11 +185,11 @@ export async function fetchConfig() {
   return res.json();
 }
 
-export async function updateConfig({ resolutionThreshold, staffWhatsappNumber }) {
+export async function updateConfig({ resolutionThreshold, staffWhatsappNumbers }) {
   const res = await fetch(`${BASE}/config`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ resolutionThreshold, staffWhatsappNumber }),
+    body: JSON.stringify({ resolutionThreshold, staffWhatsappNumbers }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `Config error ${res.status}`);

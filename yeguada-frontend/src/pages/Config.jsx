@@ -38,8 +38,8 @@ const Section = ({ title, children }) => (
 export default function Config({ backendOnline }) {
   const [threshold, setThreshold] = useState(70);
   const [savedThreshold, setSavedThreshold] = useState(70);
-  const [staffNumber, setStaffNumber] = useState('');
-  const [savedStaffNumber, setSavedStaffNumber] = useState('');
+  const [staffNumbersText, setStaffNumbersText] = useState('');
+  const [savedStaffNumbersText, setSavedStaffNumbersText] = useState('');
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -47,12 +47,13 @@ export default function Config({ backendOnline }) {
 
   const loadConfig = useCallback(async () => {
     try {
-      const { resolutionThreshold, staffWhatsappNumber } = await fetchConfig();
+      const { resolutionThreshold, staffWhatsappNumbers } = await fetchConfig();
       const pct = Math.round(resolutionThreshold * 100);
+      const numbersText = (staffWhatsappNumbers || []).join(', ');
       setThreshold(pct);
       setSavedThreshold(pct);
-      setStaffNumber(staffWhatsappNumber || '');
-      setSavedStaffNumber(staffWhatsappNumber || '');
+      setStaffNumbersText(numbersText);
+      setSavedStaffNumbersText(numbersText);
       setError(null);
     } catch {
       // backend offline al cargar — se queda con el valor por defecto
@@ -61,14 +62,15 @@ export default function Config({ backendOnline }) {
 
   useEffect(() => { loadConfig(); }, [loadConfig]);
 
-  const dirty = threshold !== savedThreshold || staffNumber !== savedStaffNumber;
+  const dirty = threshold !== savedThreshold || staffNumbersText !== savedStaffNumbersText;
 
   async function handleSave() {
     setSaving(true);
     try {
-      await updateConfig({ resolutionThreshold: threshold / 100, staffWhatsappNumber: staffNumber });
+      const staffWhatsappNumbers = staffNumbersText.split(',').map((n) => n.trim()).filter(Boolean);
+      await updateConfig({ resolutionThreshold: threshold / 100, staffWhatsappNumbers });
       setSavedThreshold(threshold);
-      setSavedStaffNumber(staffNumber);
+      setSavedStaffNumbersText(staffNumbersText);
       setError(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -81,7 +83,7 @@ export default function Config({ backendOnline }) {
 
   function handleCancel() {
     setThreshold(savedThreshold);
-    setStaffNumber(savedStaffNumber);
+    setStaffNumbersText(savedStaffNumbersText);
     setError(null);
   }
 
@@ -191,16 +193,16 @@ export default function Config({ backendOnline }) {
         ))}
 
         <div className="field" style={{ marginTop: 16 }}>
-          <label className="field-label">Número de WhatsApp del staff (notificaciones)</label>
+          <label className="field-label">Números de WhatsApp del staff (notificaciones)</label>
           <input
             className="input"
-            type="tel"
-            value={staffNumber}
-            onChange={(e) => setStaffNumber(e.target.value)}
-            placeholder="ej: 50761234567 (con código de país, sin + ni espacios)"
+            type="text"
+            value={staffNumbersText}
+            onChange={(e) => setStaffNumbersText(e.target.value)}
+            placeholder="ej: 50761234567, 50798765432 (con código de país, separados por coma)"
           />
           <p style={{ fontSize: 11.5, color: 'var(--text-sec)', marginTop: 8 }}>
-            Cuando el bot escale una conversación (de WhatsApp o del chat de este dashboard), se le reenvía un aviso a este número por WhatsApp. Déjalo vacío para desactivar esta notificación. Requiere que el bot esté conectado (ver Integración WhatsApp arriba).
+            Cuando el bot escale una conversación (de WhatsApp o del chat de este dashboard), se le reenvía un aviso por WhatsApp a cada número de esta lista. Déjalo vacío para desactivar esta notificación. Requiere que el bot esté conectado (ver Integración WhatsApp arriba).
           </p>
         </div>
       </Section>

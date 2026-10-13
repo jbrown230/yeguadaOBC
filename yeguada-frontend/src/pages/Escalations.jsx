@@ -1,17 +1,26 @@
 // pages/Escalations.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { fetchEscalations, markEscalationHandled } from '../services/api';
+import Pagination from '../components/Pagination';
+
+const PAGE_SIZE = 20;
 
 export default function Escalations() {
   const [view, setView] = useState('pending'); // 'pending' | 'all'
+  const [page, setPage] = useState(1);
   const [items, setItems] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [handlingId, setHandlingId] = useState(null);
 
-  const load = useCallback(async (v) => {
+  const load = useCallback(async (v, p) => {
     try {
-      setItems(await fetchEscalations(v === 'all'));
+      const data = await fetchEscalations({ all: v === 'all', page: p, pageSize: PAGE_SIZE });
+      setItems(data.items);
+      setTotal(data.total);
+      setTotalPages(data.totalPages);
       setError(null);
     } catch {
       setError('No se pudo cargar los escalamientos — ¿el backend está corriendo?');
@@ -20,23 +29,24 @@ export default function Escalations() {
     }
   }, []);
 
-  useEffect(() => { setLoading(true); load(view); }, [view, load]);
+  useEffect(() => { setPage(1); }, [view]);
+  useEffect(() => { setLoading(true); load(view, page); }, [view, page, load]);
 
   useEffect(() => {
-    const handler = () => load(view);
+    const handler = () => load(view, page);
     const interval = setInterval(handler, 30000);
     window.addEventListener('yeguada:metrics:updated', handler);
     return () => {
       clearInterval(interval);
       window.removeEventListener('yeguada:metrics:updated', handler);
     };
-  }, [view, load]);
+  }, [view, page, load]);
 
   async function handleMark(id) {
     setHandlingId(id);
     try {
       await markEscalationHandled(id);
-      await load(view);
+      await load(view, page);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -51,8 +61,8 @@ export default function Escalations() {
           <h1 className="page-title">Escalamientos a Humano</h1>
           <div className="page-sub">
             {view === 'pending'
-              ? `${items.length} conversación${items.length === 1 ? '' : 'es'} esperando seguimiento`
-              : 'Historial completo de conversaciones escaladas'}
+              ? `${total} conversación${total === 1 ? '' : 'es'} esperando seguimiento`
+              : `${total} conversación${total === 1 ? '' : 'es'} en el historial`}
           </div>
         </div>
         <div className="segmented">
@@ -121,6 +131,8 @@ export default function Escalations() {
             </tbody>
           </table>
         </div>
+
+        <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} disabled={loading} />
       </div>
     </div>
   );
