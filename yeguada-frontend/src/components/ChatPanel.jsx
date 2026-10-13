@@ -85,7 +85,7 @@ const ChatPanel = React.memo(function ChatPanel({ backendOnline, isOpen, onClose
     if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight;
   }, [messages, typing]);
 
-  function clearHistory() {
+  async function clearHistory() {
     // Marcar que el próximo disparo de saveHistory debe ignorarse
     clearingRef.current = true;
 
@@ -101,8 +101,10 @@ const ChatPanel = React.memo(function ChatPanel({ backendOnline, isOpen, onClose
     // Resetear el chat — el useEffect de saveHistory verá clearingRef=true y no reescribirá
     setMessages([INITIAL_MSG]);
 
-    // Resetear métricas del backend (si está online) y notificar al dashboard
-    resetBackendMetrics();
+    // Esperar el reset del backend ANTES de notificar al dashboard — si no,
+    // useMetrics/Dashboard/Escalations refrescan antes de que el DELETE
+    // termine y muestran por un momento los datos de antes de limpiar.
+    await resetBackendMetrics();
     window.dispatchEvent(new CustomEvent('yeguada:metrics:updated'));
   }
 

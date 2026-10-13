@@ -1,5 +1,5 @@
 // pages/Escalations.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchEscalations, markEscalationHandled } from '../services/api';
 import Pagination from '../components/Pagination';
 
@@ -29,8 +29,22 @@ export default function Escalations() {
     }
   }, []);
 
-  useEffect(() => { setPage(1); }, [view]);
-  useEffect(() => { setLoading(true); load(view, page); }, [view, page, load]);
+  // Un solo efecto maneja ambos casos (cambio de pestaña y cambio de página)
+  // para no disparar un fetch de más: si la pestaña cambió y la página no
+  // estaba ya en 1, solo resetea la página — el re-render que eso provoca
+  // es el que hace el fetch real, en vez de pedir primero la página vieja
+  // en la pestaña nueva y corregir después.
+  const prevView = useRef(view);
+  useEffect(() => {
+    const viewChanged = prevView.current !== view;
+    prevView.current = view;
+    if (viewChanged && page !== 1) {
+      setPage(1);
+      return;
+    }
+    setLoading(true);
+    load(view, page);
+  }, [view, page, load]);
 
   useEffect(() => {
     const handler = () => load(view, page);

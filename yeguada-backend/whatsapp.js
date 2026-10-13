@@ -27,21 +27,35 @@ function buildClient() {
     puppeteer: { args: ['--no-sandbox', '--disable-setuid-sandbox'] },
   });
 
+  // Todos los handlers abajo comparan `client === c` antes de tocar el estado
+  // compartido: un evento tardío de ESTA instancia (ej. llega después de que
+  // reconnect()/disconnect() ya la reemplazó por una más nueva) no debe pisar
+  // el estado de la conexión activa actual.
   c.on('qr', async (qr) => {
     try {
-      state.qr = await QRCode.toDataURL(qr);
+      const dataUrl = await QRCode.toDataURL(qr);
+      if (client !== c) return;
+      state.qr = dataUrl;
       state.status = 'qr';
     } catch (err) {
       console.error('Error generando QR de WhatsApp:', err);
+      if (client !== c) return;
+      // Sin esto, el estado se queda en 'initializing' para siempre y el
+      // dashboard sondea sin parar sin mostrar QR ni error.
+      state.status = 'disconnected';
+      state.qr = null;
+      client = null;
     }
   });
 
   c.on('authenticated', () => {
+    if (client !== c) return;
     state.status = 'authenticated';
     state.qr = null;
   });
 
   c.on('ready', () => {
+    if (client !== c) return;
     state.status = 'connected';
     state.qr = null;
     state.info = {
@@ -53,6 +67,7 @@ function buildClient() {
 
   c.on('auth_failure', (msg) => {
     console.error('❌ Fallo de autenticación WhatsApp:', msg);
+    if (client !== c) return;
     state.status = 'disconnected';
     state.qr = null;
     state.info = null;
@@ -61,6 +76,7 @@ function buildClient() {
 
   c.on('disconnected', (reason) => {
     console.log('⚠️ Bot de WhatsApp desconectado:', reason);
+    if (client !== c) return;
     state.status = 'disconnected';
     state.qr = null;
     state.info = null;
