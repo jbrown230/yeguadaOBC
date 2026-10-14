@@ -1,5 +1,5 @@
 // pages/Dashboard.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, Legend,
@@ -7,6 +7,10 @@ import {
 import KpiCard from '../components/Kpicard';
 import Icon from '../components/Icon';
 import Pagination from '../components/Pagination';
+import UserCell from '../components/UserCell';
+import StatusBadge from '../components/StatusBadge';
+import { useLiveRefresh } from '../hooks/useLiveRefresh';
+import { formatDateTime } from '../utils/format';
 import { fetchTimeseries, fetchConversationHistory, fetchConversations } from '../services/api';
 
 const PIE_COLORS = ['#396B2C', '#FFA700', '#8A5A12', '#7B8190', '#A3312A', '#454A54'];
@@ -25,28 +29,18 @@ export default function Dashboard({ metrics }) {
   const [convTotalPages, setConvTotalPages] = useState(1);
   const [convLoading, setConvLoading] = useState(true);
 
-  const loadConversations = useCallback(async (page) => {
+  const loadConversations = useCallback(async () => {
     try {
-      const data = await fetchConversations({ page, pageSize: CONV_PAGE_SIZE });
+      const data = await fetchConversations({ page: convPage, pageSize: CONV_PAGE_SIZE });
       setConvItems(data.items);
       setConvTotal(data.total);
       setConvTotalPages(data.totalPages);
     } catch { /* backend offline — deja los datos anteriores */ } finally {
       setConvLoading(false);
     }
-  }, []);
+  }, [convPage]);
 
-  useEffect(() => { loadConversations(convPage); }, [convPage, loadConversations]);
-
-  useEffect(() => {
-    const handler = () => loadConversations(convPage);
-    const interval = setInterval(handler, 30000);
-    window.addEventListener('yeguada:metrics:updated', handler);
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('yeguada:metrics:updated', handler);
-    };
-  }, [convPage, loadConversations]);
+  useLiveRefresh(loadConversations);
 
   async function openDetails(sessionId) {
     setSelectedSession(sessionId);
@@ -69,15 +63,7 @@ export default function Dashboard({ metrics }) {
     try { setTimeseries(await fetchTimeseries()); } catch { /* backend offline — deja los datos anteriores */ }
   }, []);
 
-  useEffect(() => {
-    loadTimeseries();
-    const interval = setInterval(loadTimeseries, 30000);
-    window.addEventListener('yeguada:metrics:updated', loadTimeseries);
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('yeguada:metrics:updated', loadTimeseries);
-    };
-  }, [loadTimeseries]);
+  useLiveRefresh(loadTimeseries);
 
   const chartData = range === 'week' ? timeseries.week : timeseries.month;
 
@@ -183,40 +169,27 @@ export default function Dashboard({ metrics }) {
               {!convLoading && convItems.length === 0 && (
                 <tr><td colSpan={6}><div className="empty-state">Sin conversaciones registradas todavía.</div></td></tr>
               )}
-              {convItems.map((c, i) => {
-                const initials = (c.sessionId || 'U').slice(0, 2).toUpperCase();
-                const time = new Date(c.time).toLocaleString('es', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
-                return (
-                  <tr key={i}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div className="row-avatar">{initials}</div>
-                        <span style={{ color: 'var(--text)' }}>{c.sessionId}</span>
+              {convItems.map((c, i) => (
+                <tr key={i}>
+                  <td><UserCell sessionId={c.sessionId} /></td>
+                  <td className="mono" style={{ color: 'var(--text-sec)', whiteSpace: 'nowrap' }}>{formatDateTime(c.time)}</td>
+                  <td><span className="tag tag-accent">{c.intent || '—'}</span></td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div className="progress-track" style={{ maxWidth: 60, flex: 1 }}>
+                        <div className="progress-fill" style={{ '--fill': c.score || 0, background: c.score >= 0.7 ? 'var(--accent)' : 'var(--warning)' }} />
                       </div>
-                    </td>
-                    <td className="mono" style={{ color: 'var(--text-sec)', whiteSpace: 'nowrap' }}>{time}</td>
-                    <td><span className="tag tag-accent">{c.intent || '—'}</span></td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div className="progress-track" style={{ maxWidth: 60, flex: 1 }}>
-                          <div className="progress-fill" style={{ '--fill': c.score || 0, background: c.score >= 0.7 ? 'var(--accent)' : 'var(--warning)' }} />
-                        </div>
-                        <span className="mono" style={{ fontSize: 11, color: 'var(--text-sec)' }}>{Math.round((c.score || 0) * 100)}%</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`status-badge ${c.resolved ? 'resolved' : 'escalated'}`}>
-                        {c.resolved ? 'Chatbot' : 'Humano'}
-                      </span>
-                    </td>
-                    <td>
-                      <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px' }} onClick={() => openDetails(c.sessionId)}>
-                        Ver detalles
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                      <span className="mono" style={{ fontSize: 11, color: 'var(--text-sec)' }}>{Math.round((c.score || 0) * 100)}%</span>
+                    </div>
+                  </td>
+                  <td><StatusBadge ok={c.resolved} okLabel="Chatbot" badLabel="Humano" /></td>
+                  <td>
+                    <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px' }} onClick={() => openDetails(c.sessionId)}>
+                      Ver detalles
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -251,7 +224,7 @@ export default function Dashboard({ metrics }) {
                 <div className="empty-state">Sin mensajes para esta sesión.</div>
               )}
               {!loadingHistory && history.map((h, i) => {
-                const time = new Date(h.time).toLocaleString('es', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                const time = formatDateTime(h.time, { withYear: false });
                 return (
                   <React.Fragment key={i}>
                     <div className="chat-msg-row user">

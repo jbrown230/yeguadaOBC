@@ -1,93 +1,49 @@
 // pages/KnowledgeBase.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchKb, createKbEntry, updateKbEntry, deleteKbEntry, fetchIntents } from '../services/api';
 import Icon from '../components/Icon';
 import Pagination from '../components/Pagination';
 import { usePagination } from '../hooks/usePagination';
+import { useCrudList } from '../hooks/useCrudList';
 
 const EMPTY_FORM = { intentId: '', question: '', answer: '', tags: '' };
 const PAGE_SIZE = 5;
 
 export default function KnowledgeBase() {
-  const [entries, setEntries] = useState([]);
-  const [intents, setIntents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [search, setSearch] = useState('');
-  const [adding, setAdding] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
+  const {
+    items: entries, loading, error, adding, editingId, form, setForm, saving,
+    startAdd, startEdit, cancelForm, handleSave, handleDelete,
+  } = useCrudList({
+    fetchFn: fetchKb,
+    createFn: createKbEntry,
+    updateFn: updateKbEntry,
+    deleteFn: deleteKbEntry,
+    emptyForm: EMPTY_FORM,
+    toForm: (entry) => ({ intentId: entry.intent_id || '', question: entry.question, answer: entry.answer, tags: entry.tags.join(', ') }),
+    toPayload: (form) => ({
+      intentId: form.intentId || null,
+      question: form.question,
+      answer: form.answer,
+      tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
+    }),
+    validate: (payload) => payload.question.trim() && payload.answer.trim(),
+    loadErrorMessage: 'No se pudo cargar la base de conocimiento — ¿el backend está corriendo?',
+  });
 
-  const load = useCallback(async () => {
-    try {
-      const [kb, intentList] = await Promise.all([fetchKb(), fetchIntents()]);
-      setEntries(kb);
-      setIntents(intentList);
-      setError(null);
-    } catch {
-      setError('No se pudo cargar la base de conocimiento — ¿el backend está corriendo?');
-    } finally {
-      setLoading(false);
-    }
+  // Lista de intenciones para el selector del formulario — no es parte del
+  // CRUD de esta página, solo una dependencia de solo lectura.
+  const [intents, setIntents] = useState([]);
+  useEffect(() => {
+    fetchIntents().then(setIntents).catch(() => {});
   }, []);
 
-  useEffect(() => { load(); }, [load]);
-
+  const [search, setSearch] = useState('');
   const filtered = entries.filter((e) =>
     e.question.toLowerCase().includes(search.toLowerCase()) ||
     e.answer.toLowerCase().includes(search.toLowerCase()) ||
     e.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()))
   );
   const { page, totalPages, setPage, pageItems } = usePagination(filtered, PAGE_SIZE);
-
-  function startAdd() {
-    setForm({ ...EMPTY_FORM, intentId: intents[0]?.id || '' });
-    setEditingId(null);
-    setAdding(true);
-  }
-
-  function startEdit(entry) {
-    setForm({ intentId: entry.intent_id || '', question: entry.question, answer: entry.answer, tags: entry.tags.join(', ') });
-    setEditingId(entry.id);
-    setAdding(true);
-  }
-
-  function cancelForm() {
-    setAdding(false);
-    setEditingId(null);
-    setForm(EMPTY_FORM);
-  }
-
-  async function handleSave() {
-    if (!form.question.trim() || !form.answer.trim()) return;
-    const tags = form.tags.split(',').map((t) => t.trim()).filter(Boolean);
-
-    setSaving(true);
-    try {
-      const payload = { intentId: form.intentId || null, question: form.question, answer: form.answer, tags };
-      if (editingId) {
-        await updateKbEntry(editingId, payload);
-      } else {
-        await createKbEntry(payload);
-      }
-      await load();
-      cancelForm();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleDelete(id) {
-    try {
-      await deleteKbEntry(id);
-      await load();
-    } catch (err) {
-      setError(err.message);
-    }
-  }
 
   return (
     <div className="page-enter">
@@ -96,7 +52,7 @@ export default function KnowledgeBase() {
           <h1 className="page-title">Base de Conocimiento</h1>
           <div className="page-sub">Pares de pregunta y respuesta — las que tienen una intención asociada también entrenan al chatbot</div>
         </div>
-        <button className="btn btn-primary" onClick={startAdd}>
+        <button className="btn btn-primary" onClick={() => startAdd({ intentId: intents[0]?.id || '' })}>
           <Icon name="plus" size={15} />
           Agregar Entrada
         </button>

@@ -35,6 +35,15 @@ const Section = ({ title, children }) => (
   </div>
 );
 
+// Mismo badge con punto pulsante para "Backend node-nlp" e "Integración
+// WhatsApp" — antes repetido literal en ambas secciones.
+const StatusBanner = ({ ok, label }) => (
+  <div className={`status-badge ${ok ? 'resolved' : 'escalated'}`} style={{ marginBottom: 16, padding: '7px 12px', fontSize: 12 }}>
+    <span className={`status-dot ${ok ? 'on' : 'off'}`} />
+    {label}
+  </div>
+);
+
 export default function Config({ backendOnline }) {
   const [threshold, setThreshold] = useState(70);
   const [savedThreshold, setSavedThreshold] = useState(70);
@@ -103,10 +112,10 @@ export default function Config({ backendOnline }) {
       </div>
 
       <Section title="Backend node-nlp">
-        <div className={`status-badge ${backendOnline ? 'resolved' : 'escalated'}`} style={{ marginBottom: 16, padding: '7px 12px', fontSize: 12 }}>
-          <span className={`status-dot ${backendOnline ? 'on' : 'off'}`} />
-          {backendOnline ? 'Backend conectado y respondiendo' : 'Backend offline — ejecute: npm start en yeguada-backend/'}
-        </div>
+        <StatusBanner
+          ok={backendOnline}
+          label={backendOnline ? 'Backend conectado y respondiendo' : 'Backend offline — ejecute: npm start en yeguada-backend/'}
+        />
         <div className="fields-2">
           <Field label="Host" value="localhost" readOnly />
           <Field label="Puerto" value="3001" readOnly />
@@ -130,10 +139,7 @@ export default function Config({ backendOnline }) {
       </Section>
 
       <Section title="Integración WhatsApp">
-        <div className={`status-badge ${waConnected ? 'resolved' : 'escalated'}`} style={{ marginBottom: 16, padding: '7px 12px', fontSize: 12 }}>
-          <span className={`status-dot ${waConnected ? 'on' : 'off'}`} />
-          {waLabel}
-        </div>
+        <StatusBanner ok={waConnected} label={waLabel} />
 
         <div className="fields-2">
           <Field label="Proveedor" value="whatsapp-web.js (no oficial)" readOnly />
