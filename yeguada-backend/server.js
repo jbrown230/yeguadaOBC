@@ -5,7 +5,11 @@
 // ─────────────────────────────────────────────────────────────
 const express = require('express');
 const cors = require('cors');
-const { trainModel, processMessage } = require('./nlp');
+const {
+  trainModel, processMessage,
+  createIntentAndRetrain, updateIntentAndRetrain, deleteIntentAndRetrain,
+  createKbAndRetrain, updateKbAndRetrain, deleteKbAndRetrain,
+} = require('./nlp');
 const whatsapp = require('./whatsapp');
 const db = require('./db');
 
@@ -52,7 +56,7 @@ function paginate(items, { page, pageSize } = {}) {
       intentCounts: metrics.intentCounts,
       recentConversations: metrics.recentConversations,
       activeNow: db.getActiveSessions(),
-      pendingEscalations: db.getEscalations().length,
+      pendingEscalations: db.getPendingEscalationsCount(),
     });
   });
 
@@ -80,8 +84,7 @@ function paginate(items, { page, pageSize } = {}) {
     if (!name || !answer || !Array.isArray(examples) || examples.length === 0) {
       return res.status(400).json({ error: 'name, answer y examples (array no vacío) son requeridos' });
     }
-    const intent = db.createIntent({ name, answer, examples });
-    await trainModel();
+    const intent = await createIntentAndRetrain({ name, answer, examples });
     res.status(201).json(intent);
   });
 
@@ -92,8 +95,7 @@ function paginate(items, { page, pageSize } = {}) {
       return res.status(400).json({ error: 'name y answer son requeridos' });
     }
     try {
-      const intent = db.updateIntent(req.params.id, { name, answer, examples });
-      await trainModel();
+      const intent = await updateIntentAndRetrain(req.params.id, { name, answer, examples });
       res.json(intent);
     } catch (err) {
       res.status(404).json({ error: err.message });
@@ -103,8 +105,7 @@ function paginate(items, { page, pageSize } = {}) {
   // DELETE /api/intents/:id — Eliminar una intención
   app.delete('/api/intents/:id', async (req, res) => {
     try {
-      db.deleteIntent(req.params.id);
-      await trainModel();
+      await deleteIntentAndRetrain(req.params.id);
       res.json({ ok: true });
     } catch (err) {
       res.status(404).json({ error: err.message });
@@ -127,8 +128,7 @@ function paginate(items, { page, pageSize } = {}) {
     if (!question || !answer) {
       return res.status(400).json({ error: 'question y answer son requeridos' });
     }
-    const entry = db.createKb({ intentId, question, answer, tags });
-    if (intentId) await trainModel();
+    const entry = await createKbAndRetrain({ intentId, question, answer, tags });
     res.status(201).json(entry);
   });
 
@@ -139,8 +139,7 @@ function paginate(items, { page, pageSize } = {}) {
       return res.status(400).json({ error: 'question y answer son requeridos' });
     }
     try {
-      const entry = db.updateKb(Number(req.params.id), { intentId, question, answer, tags });
-      await trainModel();
+      const entry = await updateKbAndRetrain(Number(req.params.id), { intentId, question, answer, tags });
       res.json(entry);
     } catch (err) {
       res.status(404).json({ error: err.message });
@@ -150,8 +149,7 @@ function paginate(items, { page, pageSize } = {}) {
   // DELETE /api/kb/:id — Eliminar entrada
   app.delete('/api/kb/:id', async (req, res) => {
     try {
-      db.deleteKb(Number(req.params.id));
-      await trainModel();
+      await deleteKbAndRetrain(Number(req.params.id));
       res.json({ ok: true });
     } catch (err) {
       res.status(404).json({ error: err.message });

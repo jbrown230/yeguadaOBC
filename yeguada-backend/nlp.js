@@ -129,7 +129,48 @@ async function processMessage(message, sessionId, channel = 'dashboard') {
   };
 }
 
+// ── Mutaciones de intenciones/KB que afectan el entrenamiento ──
+// La regla "toda mutación de intenciones, o de KB con intención asociada,
+// reentrena el modelo" vivía repetida a mano en 5 rutas distintas de
+// server.js — fácil de olvidar en una ruta nueva. Centralizada acá: server.js
+// solo valida el request y llama a una de estas.
+async function createIntentAndRetrain(payload) {
+  const intent = db.createIntent(payload);
+  await trainModel();
+  return intent;
+}
+
+async function updateIntentAndRetrain(id, payload) {
+  const intent = db.updateIntent(id, payload);
+  await trainModel();
+  return intent;
+}
+
+async function deleteIntentAndRetrain(id) {
+  db.deleteIntent(id);
+  await trainModel();
+}
+
+async function createKbAndRetrain(payload) {
+  const entry = db.createKb(payload);
+  if (payload.intentId) await trainModel();
+  return entry;
+}
+
+async function updateKbAndRetrain(id, payload) {
+  const entry = db.updateKb(id, payload);
+  await trainModel();
+  return entry;
+}
+
+async function deleteKbAndRetrain(id) {
+  db.deleteKb(id);
+  await trainModel();
+}
+
 module.exports = {
   trainModel,
   processMessage,
+  createIntentAndRetrain, updateIntentAndRetrain, deleteIntentAndRetrain,
+  createKbAndRetrain, updateKbAndRetrain, deleteKbAndRetrain,
 };
