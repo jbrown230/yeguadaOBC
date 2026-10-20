@@ -296,6 +296,12 @@ function getEscalations({ includeHandled = false } = {}) {
   `).all().map((r) => ({ ...r, handled: !!r.handled }));
 }
 
+// Para la campanita del topbar — solo el conteo, sin traer ni mapear cada
+// fila (mensaje, respuesta, score...) como hacía antes getEscalations().length.
+function getPendingEscalationsCount() {
+  return db.prepare('SELECT COUNT(*) AS n FROM conversations WHERE resolved = 0 AND handled = 0').get().n;
+}
+
 function markEscalationHandled(id) {
   const result = db.prepare("UPDATE conversations SET handled = 1, handled_at = ? WHERE id = ? AND resolved = 0")
     .run(new Date().toISOString(), id);
@@ -426,7 +432,7 @@ module.exports = {
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb, getKbEntriesByIntent,
   recordConversation, getMetrics, resetMetrics, getTimeseries, getActiveSessions,
-  getConversationsBySession, listConversations, getEscalations, markEscalationHandled,
+  getConversationsBySession, listConversations, getEscalations, getPendingEscalationsCount, markEscalationHandled,
   getResolutionThreshold, setResolutionThreshold,
   getStaffWhatsappNumbers, setStaffWhatsappNumbers,
 };

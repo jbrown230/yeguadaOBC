@@ -42,7 +42,7 @@ export default function Sidebar({ activePage, onNavigate, isOpen, onClose }) {
       </nav>
 
       <div className="sidebar-foot">
-        v1.0.0 · TFG UNA 2024<br />
+        v1.0.0 · TFG UNA 2026<br />
         node-nlp · WhatsApp API
       </div>
     </aside>

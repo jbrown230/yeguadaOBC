@@ -1,8 +1,8 @@
 {
-  "fecha": "2026-10-12T08:15:41.566Z",
+  "fecha": "2026-10-14T00:44:32.343Z",
   "intenciones": 11,
   "frasesEntrenamiento": 133,
-  "preguntasBaseConocimiento": 6,
+  "preguntasBaseConocimiento": 7,
   "frasesPrueba": 50,
   "precisionGlobal": 92,
   "tasaResolucionAutomatica": 92,
@@ -80,7 +80,7 @@
       "frase": "cuánto me sale ir con mis hijos",
       "esperada": "pricing.info",
       "obtenida": "booking.tour",
-      "score": 0.58
+      "score": 0.57
     },
     {
       "frase": "hay lugar para quedarse a dormir",
@@ -92,7 +92,7 @@
       "frase": "a qué hora debo llegar",
       "esperada": "hours.info",
       "obtenida": "location.directions",
-      "score": 0.77
+      "score": 0.79
     }
   ],
   "fueraDeDominio": {
@@ -133,13 +133,13 @@
       {
         "frase": "necesito factura a nombre de mi empresa",
         "obtenida": "fuera.de.alcance",
-        "score": 0.83,
+        "score": 0.82,
         "escalada": true
       },
       {
         "frase": "me robaron en el parqueo",
         "obtenida": "fuera.de.alcance",
-        "score": 0.8,
+        "score": 0.83,
         "escalada": true
       },
       {
