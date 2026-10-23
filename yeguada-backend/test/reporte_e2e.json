@@ -1,0 +1,131 @@
+{
+  "generatedAtUtc": "2026-10-20T01:26:19.903Z",
+  "generatedAtLocalCR": "2026-10-19 19:26:19 (CR)",
+  "gitCommit": "593e2e4ab9f0962d1125bc3a3c3601614bf6c73d",
+  "gitError": null,
+  "channel": "whatsapp",
+  "rangeRequested": {
+    "startLocalCR": "2026-10-19 00:00",
+    "endLocalCR": "2026-10-20 00:00",
+    "startUtc": "2026-10-19T06:00:00.000Z",
+    "endUtc": "2026-10-20T06:00:00.000Z"
+  },
+  "totalMessages": 8,
+  "resolvedCount": 5,
+  "escalatedCount": 3,
+  "responseTimeStats": {
+    "count": 8,
+    "minMs": 10,
+    "avgMs": 169,
+    "maxMs": 853,
+    "p95Ms": 853
+  },
+  "under1000msCount": 8,
+  "under1000msPct": 100,
+  "rows": [
+    {
+      "id": 82,
+      "created_at_local": "2026-10-19 19:10:33 (CR)",
+      "created_at_utc": "2026-10-20T01:10:33.752Z",
+      "session_id": "244508394582183@lid",
+      "message": "Hola",
+      "intent": "greeting",
+      "score": 1,
+      "resolved": true,
+      "answer": "¡Hola! 👋 Bienvenido al asistente virtual de Ecoturismo La Yeguada OBC. Estoy aquí para ayudarte con información sobre nuestros tours, precios, cómo llegar y más. ¿En qué puedo asistirte hoy?",
+      "response_time_ms": 853,
+      "handled": false
+    },
+    {
+      "id": 83,
+      "created_at_local": "2026-10-19 19:10:40 (CR)",
+      "created_at_utc": "2026-10-20T01:10:40.571Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Cuánto cuesta el tour a las cascadas?",
+      "intent": "pricing.info",
+      "score": 0.52,
+      "resolved": false,
+      "answer": "🔄 Esta consulta requiere atención personalizada. Te conectaré con un operador humano en breve. También puedes escribirnos directamente al WhatsApp +507 6XXX-XXXX.",
+      "response_time_ms": 247,
+      "handled": false
+    },
+    {
+      "id": 84,
+      "created_at_local": "2026-10-19 19:10:55 (CR)",
+      "created_at_utc": "2026-10-20T01:10:55.009Z",
+      "session_id": "244508394582183@lid",
+      "message": "Quiero reservar un tour para 4 personas",
+      "intent": "booking.tour",
+      "score": 1,
+      "resolved": true,
+      "answer": "Para reservar un tour en La Yeguada OBC, contáctenos por WhatsApp al +507 6XXX-XXXX o escríbanos al correo info@ecoturismolayeguada.com. Ofrecemos tours guiados de senderismo, cascadas y agroturismo. Se recomienda reservar con 48h de anticipación. ¿Le gustaría saber más sobre algún tour en específico?",
+      "response_time_ms": 118,
+      "handled": false
+    },
+    {
+      "id": 85,
+      "created_at_local": "2026-10-19 19:11:11 (CR)",
+      "created_at_utc": "2026-10-20T01:11:11.199Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Cómo llego a La Yeguada?",
+      "intent": "location.directions",
+      "score": 1,
+      "resolved": true,
+      "answer": "Desde Ciudad de Panamá: Carretera Interamericana → desvío en El Jagüito → Calobre → La Yeguada (~260 km, 4-5 horas). Se recomienda 4x4.",
+      "response_time_ms": 17,
+      "handled": false
+    },
+    {
+      "id": 86,
+      "created_at_local": "2026-10-19 19:11:19 (CR)",
+      "created_at_utc": "2026-10-20T01:11:19.402Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿A qué hora abren?",
+      "intent": "hours.info",
+      "score": 1,
+      "resolved": true,
+      "answer": "⏰ Horarios:\n📅 Atención: lun-dom (vía WhatsApp en horario de oficina)\n🌅 Tours: salen a las 7:00-8:00 AM\n🏞️ Acceso reserva: 7:30 AM - 4:30 PM\n\nSe recomienda llegar temprano para aprovechar el día completo.",
+      "response_time_ms": 15,
+      "handled": false
+    },
+    {
+      "id": 87,
+      "created_at_local": "2026-10-19 19:11:25 (CR)",
+      "created_at_utc": "2026-10-20T01:11:25.747Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Hay guías disponibles el sábado?",
+      "intent": "guide.availability",
+      "score": 1,
+      "resolved": true,
+      "answer": "🧭 Contamos con guías comunitarios certificados. La disponibilidad varía según la temporada:\n🌅 Temporada alta (dic-abr): reserve con 1 semana de anticipación\n🌧️ Temporada baja (may-nov): mayor disponibilidad\n\nTodos nuestros guías son locales y conocen la flora, fauna y tradiciones del lugar. ¿Para qué fecha necesita el servicio?",
+      "response_time_ms": 37,
+      "handled": false
+    },
+    {
+      "id": 88,
+      "created_at_local": "2026-10-19 19:11:33 (CR)",
+      "created_at_utc": "2026-10-20T01:11:33.618Z",
+      "session_id": "244508394582183@lid",
+      "message": "Quiero poner una queja por un cobro con tarjeta",
+      "intent": "fuera.de.alcance",
+      "score": 0.83,
+      "resolved": false,
+      "answer": "🔄 Esta consulta requiere atención personalizada. Te conectaré con un operador humano en breve. También puedes escribirnos directamente al WhatsApp +507 6XXX-XXXX.",
+      "response_time_ms": 54,
+      "handled": false
+    },
+    {
+      "id": 89,
+      "created_at_local": "2026-10-19 19:11:42 (CR)",
+      "created_at_utc": "2026-10-20T01:11:42.115Z",
+      "session_id": "244508394582183@lid",
+      "message": "asdfgh",
+      "intent": "None",
+      "score": 1,
+      "resolved": false,
+      "answer": "🔄 Esta consulta requiere atención personalizada. Te conectaré con un operador humano en breve. También puedes escribirnos directamente al WhatsApp +507 6XXX-XXXX.",
+      "response_time_ms": 10,
+      "handled": false
+    }
+  ]
+}

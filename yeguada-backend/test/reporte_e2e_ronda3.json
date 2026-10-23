@@ -1,0 +1,20 @@
+{
+  "generatedAtUtc": "2026-10-23T22:02:43.184Z",
+  "generatedAtLocalCR": "2026-10-23 16:02:43 (CR)",
+  "gitCommit": "593e2e4ab9f0962d1125bc3a3c3601614bf6c73d",
+  "gitError": null,
+  "channel": "whatsapp",
+  "rangeRequested": {
+    "startLocalCR": "2026-10-23 00:00",
+    "endLocalCR": "2026-10-24 00:00",
+    "startUtc": "2026-10-23T06:00:00.000Z",
+    "endUtc": "2026-10-24T06:00:00.000Z"
+  },
+  "totalMessages": 0,
+  "resolvedCount": 0,
+  "escalatedCount": 0,
+  "responseTimeStats": null,
+  "under1000msCount": null,
+  "under1000msPct": null,
+  "rows": []
+}
