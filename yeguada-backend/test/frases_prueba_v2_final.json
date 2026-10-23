@@ -1,0 +1,82 @@
+{
+  "descripcion": "Versión final del segundo catálogo de frases de prueba (frases_prueba_v2.json), tras quitar 10 frases que resultaron coincidir (exacta o casi) con frases de entrenamiento, y agregar 4 frases nuevas sin coincidencia conocida.",
+  "en_dominio": [
+    { "frase": "buen día, ¿me pueden ayudar?", "esperada": "greeting" },
+    { "frase": "saludos, tengo una consulta", "esperada": "greeting" },
+    { "frase": "ey, ¿hay alguien por ahí?", "esperada": "greeting" },
+
+    { "frase": "listo, eso era todo, mil gracias", "esperada": "farewell" },
+    { "frase": "con eso me quedo, hasta luego", "esperada": "farewell" },
+
+    { "frase": "quisiera apartar un recorrido para el fin de semana", "esperada": "booking.tour" },
+    { "frase": "¿cómo hago para agendar una visita con mi familia?", "esperada": "booking.tour" },
+    { "frase": "necesito inscribir a seis personas en una caminata", "esperada": "booking.tour" },
+
+    { "frase": "¿cuánto hay que pagar para entrar a la reserva?", "esperada": "pricing.info" },
+    { "frase": "¿me dan el costo del recorrido completo?", "esperada": "pricing.info" },
+
+    { "frase": "¿se puede ir con alguien que conozca el camino?", "esperada": "guide.availability" },
+    { "frase": "¿hay baquianos que nos acompañen?", "esperada": "guide.availability" },
+    { "frase": "¿tienen guías que hablen inglés?", "esperada": "guide.availability" },
+
+    { "frase": "¿en qué consiste lo que ofrecen allá?", "esperada": "general.info" },
+    { "frase": "cuéntenme un poco sobre el lugar", "esperada": "general.info" },
+    { "frase": "¿qué tipo de turismo hacen?", "esperada": "general.info" },
+
+    { "frase": "¿por dónde se llega desde Panamá?", "esperada": "location.directions" },
+    { "frase": "mándenme la ubicación en el mapa", "esperada": "location.directions" },
+    { "frase": "¿cuánto se tarda en carro desde Santiago?", "esperada": "location.directions" },
+
+    { "frase": "¿puedo armar una carpa allá?", "esperada": "camping.info" },
+    { "frase": "¿hay áreas para dormir en tienda de campaña?", "esperada": "camping.info" },
+    { "frase": "¿necesito llevar mi propio equipo para pasar la noche?", "esperada": "camping.info" },
+
+    { "frase": "¿qué tan lejos queda la cascada del parqueo?", "esperada": "waterfall.info" },
+    { "frase": "¿se puede llegar caminando a las cascadas?", "esperada": "waterfall.info" },
+    { "frase": "¿está bonita la caída de agua en época de lluvia?", "esperada": "waterfall.info" },
+
+    { "frase": "¿hasta qué hora está abierto el acceso?", "esperada": "hours.info" },
+    { "frase": "¿en qué horario atienden por mensaje?", "esperada": "hours.info" },
+    { "frase": "¿los sábados también abren?", "esperada": "hours.info" },
+
+    { "frase": "¿es buena idea llevar botas?", "esperada": "que.llevar" },
+    { "frase": "¿necesito impermeable si va a llover?", "esperada": "que.llevar" },
+
+    { "frase": "¿hay dónde comer cerca?", "esperada": "servicios.en.la.zona" },
+    { "frase": "¿existen hospedajes rurales por la zona?", "esperada": "servicios.en.la.zona" },
+
+    { "frase": "¿los perritos deben ir con correa?", "esperada": "mascotas" },
+    { "frase": "¿puedo traer a mi gato?", "esperada": "mascotas" },
+    { "frase": "¿se permite entrar con animalitos?", "esperada": "mascotas" },
+
+    { "frase": "mi mamá usa silla de ruedas, ¿puede visitar?", "esperada": "accesibilidad" },
+    { "frase": "¿hay senderos fáciles para personas mayores?", "esperada": "accesibilidad" },
+    { "frase": "¿las rutas son aptas para alguien con dificultad para caminar?", "esperada": "accesibilidad" },
+
+    { "frase": "¿se puede almorzar en el lugar?", "esperada": "alimentacion" },
+    { "frase": "¿dónde puedo conseguir alimentos durante la visita?", "esperada": "alimentacion" },
+
+    { "frase": "somos un colegio y queremos una visita con los estudiantes", "esperada": "grupos.educativos" },
+    { "frase": "queremos llevar a los alumnos de la escuela", "esperada": "grupos.educativos" },
+    { "frase": "¿organizan excursiones para estudiantes?", "esperada": "grupos.educativos" },
+
+    { "frase": "quiero ayudar sembrando árboles, ¿se puede?", "esperada": "voluntariado" },
+    { "frase": "¿aceptan voluntarios para limpiar senderos?", "esperada": "voluntariado" },
+    { "frase": "¿cómo me uno a una jornada de reforestación?", "esperada": "voluntariado" },
+
+    { "frase": "¿cómo cuidan el ambiente en la reserva?", "esperada": "sostenibilidad" },
+    { "frase": "¿manejan los desechos de forma responsable?", "esperada": "sostenibilidad" },
+
+    { "frase": "¿de qué manera puedo ayudar a la comunidad?", "esperada": "apoyo.comunitario" },
+    { "frase": "¿se puede comprar a productores del lugar?", "esperada": "apoyo.comunitario" },
+    { "frase": "¿cómo contribuyo a que el dinero quede en la zona?", "esperada": "apoyo.comunitario" }
+  ],
+  "fuera_de_dominio": [
+    "¿me pueden recomendar un hotel en la ciudad de David?",
+    "necesito cambiar la tarjeta con la que pagué",
+    "¿cuánto cuesta un taxi desde el aeropuerto?",
+    "quiero hablar con el gerente",
+    "¿me pueden prestar una bicicleta?",
+    "¿cuál es el mejor restaurante de Ciudad de Panamá?"
+  ]
+}

@@ -1,0 +1,311 @@
+{
+  "fecha": "2026-10-23T23:13:57.010Z",
+  "catalogoUsado": "test/frases_prueba_v2_final.json",
+  "frasesExcluidas": [],
+  "intenciones": 20,
+  "frasesEntrenamiento": 229,
+  "preguntasBaseConocimiento": 13,
+  "frasesPrueba": 51,
+  "precisionGlobal": 54.9,
+  "tasaResolucionAutomatica": 62.7,
+  "resueltasCorrectamente": 45.1,
+  "porIntencion": {
+    "greeting": {
+      "total": 3,
+      "correctas": 2,
+      "resueltas": 2,
+      "precision": 66.7
+    },
+    "farewell": {
+      "total": 2,
+      "correctas": 2,
+      "resueltas": 1,
+      "precision": 100
+    },
+    "booking.tour": {
+      "total": 3,
+      "correctas": 3,
+      "resueltas": 3,
+      "precision": 100
+    },
+    "pricing.info": {
+      "total": 2,
+      "correctas": 1,
+      "resueltas": 1,
+      "precision": 50
+    },
+    "guide.availability": {
+      "total": 3,
+      "correctas": 1,
+      "resueltas": 2,
+      "precision": 33.3
+    },
+    "general.info": {
+      "total": 3,
+      "correctas": 2,
+      "resueltas": 3,
+      "precision": 66.7
+    },
+    "location.directions": {
+      "total": 3,
+      "correctas": 2,
+      "resueltas": 3,
+      "precision": 66.7
+    },
+    "camping.info": {
+      "total": 3,
+      "correctas": 2,
+      "resueltas": 3,
+      "precision": 66.7
+    },
+    "waterfall.info": {
+      "total": 3,
+      "correctas": 1,
+      "resueltas": 0,
+      "precision": 33.3
+    },
+    "hours.info": {
+      "total": 3,
+      "correctas": 3,
+      "resueltas": 3,
+      "precision": 100
+    },
+    "que.llevar": {
+      "total": 2,
+      "correctas": 0,
+      "resueltas": 0,
+      "precision": 0
+    },
+    "servicios.en.la.zona": {
+      "total": 2,
+      "correctas": 0,
+      "resueltas": 1,
+      "precision": 0
+    },
+    "mascotas": {
+      "total": 3,
+      "correctas": 1,
+      "resueltas": 2,
+      "precision": 33.3
+    },
+    "accesibilidad": {
+      "total": 3,
+      "correctas": 1,
+      "resueltas": 2,
+      "precision": 33.3
+    },
+    "alimentacion": {
+      "total": 2,
+      "correctas": 0,
+      "resueltas": 1,
+      "precision": 0
+    },
+    "grupos.educativos": {
+      "total": 3,
+      "correctas": 0,
+      "resueltas": 0,
+      "precision": 0
+    },
+    "voluntariado": {
+      "total": 3,
+      "correctas": 3,
+      "resueltas": 1,
+      "precision": 100
+    },
+    "sostenibilidad": {
+      "total": 2,
+      "correctas": 1,
+      "resueltas": 2,
+      "precision": 50
+    },
+    "apoyo.comunitario": {
+      "total": 3,
+      "correctas": 3,
+      "resueltas": 2,
+      "precision": 100
+    }
+  },
+  "errores": [
+    {
+      "frase": "ey, ¿hay alguien por ahí?",
+      "esperada": "greeting",
+      "obtenida": "camping.info",
+      "score": 0.65
+    },
+    {
+      "frase": "¿cuánto hay que pagar para entrar a la reserva?",
+      "esperada": "pricing.info",
+      "obtenida": "None",
+      "score": 1
+    },
+    {
+      "frase": "¿se puede ir con alguien que conozca el camino?",
+      "esperada": "guide.availability",
+      "obtenida": "general.info",
+      "score": 1
+    },
+    {
+      "frase": "¿hay baquianos que nos acompañen?",
+      "esperada": "guide.availability",
+      "obtenida": "None",
+      "score": 1
+    },
+    {
+      "frase": "cuéntenme un poco sobre el lugar",
+      "esperada": "general.info",
+      "obtenida": "accesibilidad",
+      "score": 0.9
+    },
+    {
+      "frase": "¿cuánto se tarda en carro desde Santiago?",
+      "esperada": "location.directions",
+      "obtenida": "general.info",
+      "score": 0.83
+    },
+    {
+      "frase": "¿necesito llevar mi propio equipo para pasar la noche?",
+      "esperada": "camping.info",
+      "obtenida": "que.llevar",
+      "score": 0.73
+    },
+    {
+      "frase": "¿qué tan lejos queda la cascada del parqueo?",
+      "esperada": "waterfall.info",
+      "obtenida": "sostenibilidad",
+      "score": 0.57
+    },
+    {
+      "frase": "¿está bonita la caída de agua en época de lluvia?",
+      "esperada": "waterfall.info",
+      "obtenida": "fuera.de.alcance",
+      "score": 0.89
+    },
+    {
+      "frase": "¿es buena idea llevar botas?",
+      "esperada": "que.llevar",
+      "obtenida": "greeting",
+      "score": 0.62
+    },
+    {
+      "frase": "¿necesito impermeable si va a llover?",
+      "esperada": "que.llevar",
+      "obtenida": "booking.tour",
+      "score": 0.63
+    },
+    {
+      "frase": "¿hay dónde comer cerca?",
+      "esperada": "servicios.en.la.zona",
+      "obtenida": "alimentacion",
+      "score": 0.83
+    },
+    {
+      "frase": "¿existen hospedajes rurales por la zona?",
+      "esperada": "servicios.en.la.zona",
+      "obtenida": "apoyo.comunitario",
+      "score": 0.56
+    },
+    {
+      "frase": "¿los perritos deben ir con correa?",
+      "esperada": "mascotas",
+      "obtenida": "None",
+      "score": 1
+    },
+    {
+      "frase": "¿puedo traer a mi gato?",
+      "esperada": "mascotas",
+      "obtenida": "waterfall.info",
+      "score": 0.93
+    },
+    {
+      "frase": "mi mamá usa silla de ruedas, ¿puede visitar?",
+      "esperada": "accesibilidad",
+      "obtenida": "hours.info",
+      "score": 0.72
+    },
+    {
+      "frase": "¿hay senderos fáciles para personas mayores?",
+      "esperada": "accesibilidad",
+      "obtenida": "None",
+      "score": 1
+    },
+    {
+      "frase": "¿se puede almorzar en el lugar?",
+      "esperada": "alimentacion",
+      "obtenida": "general.info",
+      "score": 0.75
+    },
+    {
+      "frase": "¿dónde puedo conseguir alimentos durante la visita?",
+      "esperada": "alimentacion",
+      "obtenida": "None",
+      "score": 1
+    },
+    {
+      "frase": "somos un colegio y queremos una visita con los estudiantes",
+      "esperada": "grupos.educativos",
+      "obtenida": "fuera.de.alcance",
+      "score": 0.89
+    },
+    {
+      "frase": "queremos llevar a los alumnos de la escuela",
+      "esperada": "grupos.educativos",
+      "obtenida": "None",
+      "score": 1
+    },
+    {
+      "frase": "¿organizan excursiones para estudiantes?",
+      "esperada": "grupos.educativos",
+      "obtenida": "None",
+      "score": 1
+    },
+    {
+      "frase": "¿cómo cuidan el ambiente en la reserva?",
+      "esperada": "sostenibilidad",
+      "obtenida": "camping.info",
+      "score": 1
+    }
+  ],
+  "fueraDeDominio": {
+    "total": 6,
+    "escaladas": 4,
+    "tasaEscalamiento": 66.7,
+    "detalle": [
+      {
+        "frase": "¿me pueden recomendar un hotel en la ciudad de David?",
+        "obtenida": "voluntariado",
+        "score": 0.67,
+        "escalada": true
+      },
+      {
+        "frase": "necesito cambiar la tarjeta con la que pagué",
+        "obtenida": "fuera.de.alcance",
+        "score": 0.64,
+        "escalada": true
+      },
+      {
+        "frase": "¿cuánto cuesta un taxi desde el aeropuerto?",
+        "obtenida": "pricing.info",
+        "score": 1,
+        "escalada": false
+      },
+      {
+        "frase": "quiero hablar con el gerente",
+        "obtenida": "accesibilidad",
+        "score": 0.64,
+        "escalada": true
+      },
+      {
+        "frase": "¿me pueden prestar una bicicleta?",
+        "obtenida": "general.info",
+        "score": 0.57,
+        "escalada": true
+      },
+      {
+        "frase": "¿cuál es el mejor restaurante de Ciudad de Panamá?",
+        "obtenida": "alimentacion",
+        "score": 0.92,
+        "escalada": false
+      }
+    ]
+  }
+}

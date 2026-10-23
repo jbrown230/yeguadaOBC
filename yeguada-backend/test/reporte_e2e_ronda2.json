@@ -1,0 +1,214 @@
+{
+  "generatedAtUtc": "2026-10-20T01:50:44.816Z",
+  "generatedAtLocalCR": "2026-10-19 19:50:44 (CR)",
+  "gitCommit": "593e2e4ab9f0962d1125bc3a3c3601614bf6c73d",
+  "gitError": null,
+  "channel": "whatsapp",
+  "rangeRequested": {
+    "startLocalCR": "2026-10-19 00:00",
+    "endLocalCR": "2026-10-20 00:00",
+    "startUtc": "2026-10-19T06:00:00.000Z",
+    "endUtc": "2026-10-20T06:00:00.000Z"
+  },
+  "totalMessages": 11,
+  "resolvedCount": 9,
+  "escalatedCount": 2,
+  "responseTimeStats": {
+    "count": 11,
+    "minMs": 11,
+    "avgMs": 36,
+    "maxMs": 108,
+    "p95Ms": 108
+  },
+  "under1000msCount": 11,
+  "under1000msPct": 100,
+  "rows": [
+    {
+      "id": 96,
+      "created_at_local": "2026-10-19 19:41:06 (CR)",
+      "created_at_utc": "2026-10-20T01:41:06.453Z",
+      "session_id": "244508394582183@lid",
+      "message": "Hola",
+      "intent": "greeting",
+      "score": 1,
+      "resolved": true,
+      "answer": "¡Hola! 👋 Bienvenido al asistente virtual de Ecoturismo La Yeguada OBC. Estoy aquí para ayudarte con información sobre nuestros tours, precios, cómo llegar y más. ¿En qué puedo asistirte hoy?",
+      "response_time_ms": 11,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": true,
+        "intentId": "greeting"
+      }
+    },
+    {
+      "id": 97,
+      "created_at_local": "2026-10-19 19:41:12 (CR)",
+      "created_at_utc": "2026-10-20T01:41:12.433Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Cuánto cuesta el tour a las cascadas?",
+      "intent": "pricing.info",
+      "score": 1,
+      "resolved": true,
+      "answer": "💰 Nuestros precios son:\n🥾 Tour Senderismo Básico: $25/persona\n🌊 Tour Cascadas Celestes: $35/persona\n🌿 Tour Completo (cascadas + almuerzo típico): $45/persona\n\nGrupos de 8+ personas tienen descuento especial del 15%. Niños menores de 6 años gratuitos. ¿Desea información de algún tour específico?",
+      "response_time_ms": 34,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 98,
+      "created_at_local": "2026-10-19 19:41:17 (CR)",
+      "created_at_utc": "2026-10-20T01:41:17.138Z",
+      "session_id": "244508394582183@lid",
+      "message": "Quiero reservar un tour para 4 personas",
+      "intent": "booking.tour",
+      "score": 1,
+      "resolved": true,
+      "answer": "Para reservar un tour en La Yeguada OBC, contáctenos por WhatsApp al +507 6XXX-XXXX o escríbanos al correo info@ecoturismolayeguada.com. Ofrecemos tours guiados de senderismo, cascadas y agroturismo. Se recomienda reservar con 48h de anticipación. ¿Le gustaría saber más sobre algún tour en específico?",
+      "response_time_ms": 108,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 99,
+      "created_at_local": "2026-10-19 19:41:28 (CR)",
+      "created_at_utc": "2026-10-20T01:41:28.516Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Cómo llego a La Yeguada?",
+      "intent": "location.directions",
+      "score": 1,
+      "resolved": true,
+      "answer": "Desde Ciudad de Panamá: Carretera Interamericana → desvío en El Jagüito → Calobre → La Yeguada (~260 km, 4-5 horas). Se recomienda 4x4.",
+      "response_time_ms": 19,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 100,
+      "created_at_local": "2026-10-19 19:41:34 (CR)",
+      "created_at_utc": "2026-10-20T01:41:34.401Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿A qué hora abren?",
+      "intent": "hours.info",
+      "score": 1,
+      "resolved": true,
+      "answer": "⏰ Horarios:\n📅 Atención: lun-dom (vía WhatsApp en horario de oficina)\n🌅 Tours: salen a las 7:00-8:00 AM\n🏞️ Acceso reserva: 7:30 AM - 4:30 PM\n\nSe recomienda llegar temprano para aprovechar el día completo.",
+      "response_time_ms": 18,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 101,
+      "created_at_local": "2026-10-19 19:41:41 (CR)",
+      "created_at_utc": "2026-10-20T01:41:41.562Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Hay guías disponibles el sábado?",
+      "intent": "guide.availability",
+      "score": 1,
+      "resolved": true,
+      "answer": "🧭 Contamos con guías comunitarios certificados. La disponibilidad varía según la temporada:\n🌅 Temporada alta (dic-abr): reserve con 1 semana de anticipación\n🌧️ Temporada baja (may-nov): mayor disponibilidad\n\nTodos nuestros guías son locales y conocen la flora, fauna y tradiciones del lugar. ¿Para qué fecha necesita el servicio?",
+      "response_time_ms": 39,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 102,
+      "created_at_local": "2026-10-19 19:41:47 (CR)",
+      "created_at_utc": "2026-10-20T01:41:47.337Z",
+      "session_id": "244508394582183@lid",
+      "message": "Quiero poner una queja por un cobro con tarjeta",
+      "intent": "fuera.de.alcance",
+      "score": 0.79,
+      "resolved": false,
+      "answer": "🔄 Esta consulta requiere atención personalizada. Te conectaré con un operador humano en breve. También puedes escribirnos directamente al WhatsApp +507 6XXX-XXXX.",
+      "response_time_ms": 41,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 103,
+      "created_at_local": "2026-10-19 19:41:51 (CR)",
+      "created_at_utc": "2026-10-20T01:41:51.823Z",
+      "session_id": "244508394582183@lid",
+      "message": "asdfgh",
+      "intent": "None",
+      "score": 1,
+      "resolved": false,
+      "answer": "🔄 Esta consulta requiere atención personalizada. Te conectaré con un operador humano en breve. También puedes escribirnos directamente al WhatsApp +507 6XXX-XXXX.",
+      "response_time_ms": 20,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 104,
+      "created_at_local": "2026-10-19 19:42:31 (CR)",
+      "created_at_utc": "2026-10-20T01:42:31.573Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Cuál es la tarifa para visitar las cascadas?",
+      "intent": "pricing.info",
+      "score": 0.86,
+      "resolved": true,
+      "answer": "💰 Nuestros precios son:\n🥾 Tour Senderismo Básico: $25/persona\n🌊 Tour Cascadas Celestes: $35/persona\n🌿 Tour Completo (cascadas + almuerzo típico): $45/persona\n\nGrupos de 8+ personas tienen descuento especial del 15%. Niños menores de 6 años gratuitos. ¿Desea información de algún tour específico?",
+      "response_time_ms": 39,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 105,
+      "created_at_local": "2026-10-19 19:42:38 (CR)",
+      "created_at_utc": "2026-10-20T01:42:38.187Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Cuánto me sale el recorrido a la cascada con guía?",
+      "intent": "guide.availability",
+      "score": 0.77,
+      "resolved": true,
+      "answer": "🧭 Contamos con guías comunitarios certificados. La disponibilidad varía según la temporada:\n🌅 Temporada alta (dic-abr): reserve con 1 semana de anticipación\n🌧️ Temporada baja (may-nov): mayor disponibilidad\n\nTodos nuestros guías son locales y conocen la flora, fauna y tradiciones del lugar. ¿Para qué fecha necesita el servicio?",
+      "response_time_ms": 38,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    },
+    {
+      "id": 106,
+      "created_at_local": "2026-10-19 19:42:47 (CR)",
+      "created_at_utc": "2026-10-20T01:42:47.061Z",
+      "session_id": "244508394582183@lid",
+      "message": "¿Qué precio tiene la entrada a las cascadas?",
+      "intent": "pricing.info",
+      "score": 0.93,
+      "resolved": true,
+      "answer": "💰 Nuestros precios son:\n🥾 Tour Senderismo Básico: $25/persona\n🌊 Tour Cascadas Celestes: $35/persona\n🌿 Tour Completo (cascadas + almuerzo típico): $45/persona\n\nGrupos de 8+ personas tienen descuento especial del 15%. Niños menores de 6 años gratuitos. ¿Desea información de algún tour específico?",
+      "response_time_ms": 33,
+      "handled": false,
+      "enEntrenamiento": {
+        "coincide": false,
+        "intentId": null
+      }
+    }
+  ]
+}

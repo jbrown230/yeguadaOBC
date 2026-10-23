@@ -1,0 +1,139 @@
+{
+  "fecha": "2026-10-23T23:14:08.562Z",
+  "catalogoUsado": "test/frases_prueba.json",
+  "frasesExcluidas": [
+    "deseo reservar una caminata guiada",
+    "cuánto me sale ir con mis hijos",
+    "qué se puede hacer allá",
+    "me cuentan qué ofrecen",
+    "a cuántas horas está de la ciudad",
+    "hay lugar para quedarse a dormir",
+    "abren los domingos",
+    "a qué hora debo llegar"
+  ],
+  "intenciones": 20,
+  "frasesEntrenamiento": 229,
+  "preguntasBaseConocimiento": 13,
+  "frasesPrueba": 42,
+  "precisionGlobal": 100,
+  "tasaResolucionAutomatica": 100,
+  "resueltasCorrectamente": 100,
+  "porIntencion": {
+    "booking.tour": {
+      "total": 4,
+      "correctas": 4,
+      "resueltas": 4,
+      "precision": 100
+    },
+    "pricing.info": {
+      "total": 4,
+      "correctas": 4,
+      "resueltas": 4,
+      "precision": 100
+    },
+    "guide.availability": {
+      "total": 5,
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
+    },
+    "general.info": {
+      "total": 3,
+      "correctas": 3,
+      "resueltas": 3,
+      "precision": 100
+    },
+    "location.directions": {
+      "total": 4,
+      "correctas": 4,
+      "resueltas": 4,
+      "precision": 100
+    },
+    "camping.info": {
+      "total": 4,
+      "correctas": 4,
+      "resueltas": 4,
+      "precision": 100
+    },
+    "waterfall.info": {
+      "total": 5,
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
+    },
+    "hours.info": {
+      "total": 3,
+      "correctas": 3,
+      "resueltas": 3,
+      "precision": 100
+    },
+    "greeting": {
+      "total": 5,
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
+    },
+    "farewell": {
+      "total": 5,
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
+    }
+  },
+  "errores": [],
+  "fueraDeDominio": {
+    "total": 8,
+    "escaladas": 8,
+    "tasaEscalamiento": 100,
+    "detalle": [
+      {
+        "frase": "quiero cancelar mi reserva y que me devuelvan el dinero",
+        "obtenida": "fuera.de.alcance",
+        "score": 1,
+        "escalada": true
+      },
+      {
+        "frase": "tuve un problema con el guía y quiero poner una queja",
+        "obtenida": "fuera.de.alcance",
+        "score": 1,
+        "escalada": true
+      },
+      {
+        "frase": "aceptan pago con tarjeta de crédito",
+        "obtenida": "fuera.de.alcance",
+        "score": 0.97,
+        "escalada": true
+      },
+      {
+        "frase": "venden artesanías en la comunidad",
+        "obtenida": "fuera.de.alcance",
+        "score": 0.53,
+        "escalada": true
+      },
+      {
+        "frase": "cuál es el clima ahora mismo",
+        "obtenida": "fuera.de.alcance",
+        "score": 0.87,
+        "escalada": true
+      },
+      {
+        "frase": "necesito factura a nombre de mi empresa",
+        "obtenida": "fuera.de.alcance",
+        "score": 0.62,
+        "escalada": true
+      },
+      {
+        "frase": "me robaron en el parqueo",
+        "obtenida": "None",
+        "score": 1,
+        "escalada": true
+      },
+      {
+        "frase": "tienen señal de internet allá",
+        "obtenida": "fuera.de.alcance",
+        "score": 0.97,
+        "escalada": true
+      }
+    ]
+  }
+}

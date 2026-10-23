@@ -1,24 +1,24 @@
 {
-  "fecha": "2026-10-14T00:44:32.343Z",
-  "intenciones": 11,
-  "frasesEntrenamiento": 133,
-  "preguntasBaseConocimiento": 7,
+  "fecha": "2026-10-23T20:56:42.108Z",
+  "intenciones": 20,
+  "frasesEntrenamiento": 229,
+  "preguntasBaseConocimiento": 13,
   "frasesPrueba": 50,
-  "precisionGlobal": 92,
-  "tasaResolucionAutomatica": 92,
-  "resueltasCorrectamente": 88,
+  "precisionGlobal": 100,
+  "tasaResolucionAutomatica": 100,
+  "resueltasCorrectamente": 100,
   "porIntencion": {
     "booking.tour": {
       "total": 5,
-      "correctas": 4,
+      "correctas": 5,
       "resueltas": 5,
-      "precision": 80
+      "precision": 100
     },
     "pricing.info": {
       "total": 5,
-      "correctas": 4,
-      "resueltas": 4,
-      "precision": 80
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
     },
     "guide.availability": {
       "total": 5,
@@ -29,7 +29,7 @@
     "general.info": {
       "total": 5,
       "correctas": 5,
-      "resueltas": 4,
+      "resueltas": 5,
       "precision": 100
     },
     "location.directions": {
@@ -40,9 +40,9 @@
     },
     "camping.info": {
       "total": 5,
-      "correctas": 4,
-      "resueltas": 4,
-      "precision": 80
+      "correctas": 5,
+      "resueltas": 5,
+      "precision": 100
     },
     "waterfall.info": {
       "total": 5,
@@ -52,14 +52,14 @@
     },
     "hours.info": {
       "total": 5,
-      "correctas": 4,
+      "correctas": 5,
       "resueltas": 5,
-      "precision": 80
+      "precision": 100
     },
     "greeting": {
       "total": 5,
       "correctas": 5,
-      "resueltas": 4,
+      "resueltas": 5,
       "precision": 100
     },
     "farewell": {
@@ -69,32 +69,7 @@
       "precision": 100
     }
   },
-  "errores": [
-    {
-      "frase": "deseo reservar una caminata guiada",
-      "esperada": "booking.tour",
-      "obtenida": "guide.availability",
-      "score": 0.76
-    },
-    {
-      "frase": "cuánto me sale ir con mis hijos",
-      "esperada": "pricing.info",
-      "obtenida": "booking.tour",
-      "score": 0.57
-    },
-    {
-      "frase": "hay lugar para quedarse a dormir",
-      "esperada": "camping.info",
-      "obtenida": "fuera.de.alcance",
-      "score": 0.61
-    },
-    {
-      "frase": "a qué hora debo llegar",
-      "esperada": "hours.info",
-      "obtenida": "location.directions",
-      "score": 0.79
-    }
-  ],
+  "errores": [],
   "fueraDeDominio": {
     "total": 8,
     "escaladas": 8,
@@ -103,49 +78,49 @@
       {
         "frase": "quiero cancelar mi reserva y que me devuelvan el dinero",
         "obtenida": "fuera.de.alcance",
-        "score": 0.98,
+        "score": 1,
         "escalada": true
       },
       {
         "frase": "tuve un problema con el guía y quiero poner una queja",
         "obtenida": "fuera.de.alcance",
-        "score": 0.86,
+        "score": 1,
         "escalada": true
       },
       {
         "frase": "aceptan pago con tarjeta de crédito",
         "obtenida": "fuera.de.alcance",
-        "score": 1,
+        "score": 0.97,
         "escalada": true
       },
       {
         "frase": "venden artesanías en la comunidad",
         "obtenida": "fuera.de.alcance",
-        "score": 0.94,
+        "score": 0.53,
         "escalada": true
       },
       {
         "frase": "cuál es el clima ahora mismo",
-        "obtenida": "None",
-        "score": 1,
+        "obtenida": "fuera.de.alcance",
+        "score": 0.87,
         "escalada": true
       },
       {
         "frase": "necesito factura a nombre de mi empresa",
         "obtenida": "fuera.de.alcance",
-        "score": 0.82,
+        "score": 0.62,
         "escalada": true
       },
       {
         "frase": "me robaron en el parqueo",
-        "obtenida": "fuera.de.alcance",
-        "score": 0.83,
+        "obtenida": "None",
+        "score": 1,
         "escalada": true
       },
       {
         "frase": "tienen señal de internet allá",
         "obtenida": "fuera.de.alcance",
-        "score": 1,
+        "score": 0.97,
         "escalada": true
       }
     ]
