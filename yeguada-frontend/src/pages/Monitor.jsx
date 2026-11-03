@@ -1,6 +1,7 @@
 // pages/Monitor.jsx
 import React from 'react';
 import KpiCard from '../components/Kpicard';
+import { intentLabel } from '../utils/intents';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Monitor(props) {
@@ -13,10 +14,9 @@ export default function Monitor(props) {
   const avgResponseTimeMs = metrics?.avgResponseTimeMs ?? 0;
   const activeNow = metrics?.activeNow ?? { total: 0, chatbot: 0, humano: 0 };
 
-  const intentData = Object.entries(intentCounts).map(([k, v]) => ({
-    name: k.split('.')[0],
-    total: v,
-  }));
+  const intentData = Object.entries(intentCounts)
+    .map(([k, v]) => ({ name: intentLabel(k), total: v }))
+    .sort((a, b) => b.total - a.total);
 
   return (
     <div className="page-enter">
@@ -36,13 +36,13 @@ export default function Monitor(props) {
       <div className="monitor-charts">
         <div className="panel panel-pad">
           <div className="panel-title" style={{ marginBottom: 12 }}>Chats por Intención</div>
-          <ResponsiveContainer width="100%" height={210}>
-            <BarChart data={intentData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-100)" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 10.5, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10.5, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 11.5, borderRadius: 8, border: '1px solid var(--border)', fontFamily: 'var(--font-sans)' }} />
-              <Bar dataKey="total" fill="var(--accent)" radius={[3, 3, 0, 0]} maxBarSize={36} />
+          <ResponsiveContainer width="100%" height={Math.max(220, intentData.length * 34)}>
+            <BarChart data={intentData} layout="vertical" margin={{ top: 4, right: 16, bottom: 0, left: 4 }}>
+              <CartesianGrid strokeDasharray="4 6" stroke="var(--fill-2)" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 12, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 12.5, fill: 'var(--text-sec)' }} axisLine={false} tickLine={false} />
+              <Tooltip cursor={{ fill: 'var(--fill-1)' }} contentStyle={{ fontSize: 13, borderRadius: 14, border: 'none', boxShadow: 'var(--shadow-md)', fontFamily: 'var(--font-sans)', background: 'var(--surface)', color: 'var(--text)' }} />
+              <Bar dataKey="total" fill="var(--accent)" radius={[0, 8, 8, 0]} maxBarSize={18} />
             </BarChart>
           </ResponsiveContainer>
         </div>

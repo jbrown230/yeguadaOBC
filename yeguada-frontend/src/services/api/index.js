@@ -3,7 +3,8 @@
 // que el resto del frontend siga importando con `from '../services/api'`
 // sin tener que saber en qué archivo vive cada función.
 
-export * from './chat';
+export * from './auth';
+export * from './users';
 export * from './metrics';
 export * from './conversations';
 export * from './escalations';

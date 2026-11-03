@@ -1,96 +1,49 @@
-// App.jsx — Root component
-import React, { useState, memo, useCallback } from 'react';
-import Topbar from './components/Topbar';
-import Sidebar from './components/Sidebar';
-import ChatPanel from './components/ChatPanel';
-import Dashboard from './pages/Dashboard';
-import Intents from './pages/Intents';
-import KnowledgeBase from './pages/KnowledgeBase';
-import Escalations from './pages/Escalations';
-import Monitor from './pages/Monitor';
-import Config from './pages/Config';
-import { useMetrics } from './hooks/useMetrics';
-
-const MainContent = memo(function MainContent({
-  activePage, metrics, backendOnline, loading, lastUpdated,
-}) {
-  const renderPage = () => {
-    switch (activePage) {
-      case 'dashboard': return <Dashboard metrics={metrics} />;
-      case 'intents':   return <Intents metrics={metrics} />;
-      case 'kb':        return <KnowledgeBase />;
-      case 'escalations': return <Escalations />;
-      case 'monitor':   return <Monitor metrics={metrics} />;
-      case 'config':    return <Config backendOnline={backendOnline} />;
-      default:          return <Dashboard metrics={metrics} />;
-    }
-  };
-
-  return (
-    <main className="app-main">
-      {loading ? (
-        <div className="loading-state">
-          <div className="spinner" />
-          <span style={{ fontSize: 13, color: 'var(--text-sec)' }}>Cargando dashboard...</span>
-        </div>
-      ) : renderPage()}
-      {lastUpdated && (
-        <div className="last-updated">
-          Última actualización: {lastUpdated}
-        </div>
-      )}
-    </main>
-  );
-});
+// App.jsx — Root: decide entre pantallas de acceso y el panel según la sesión
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import AppShell from './AppShell';
+import Login from './pages/auth/Login';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
+import ForceChangePassword from './pages/auth/ForceChangePassword';
+import AuthShell from './components/auth/AuthShell';
+import { useAuth } from './context/AuthContext';
 
 export default function App() {
-  const [activePage, setActivePage]   = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [chatOpen, setChatOpen]       = useState(false);
-  const { metrics, backendOnline, loading, lastUpdated } = useMetrics(30000);
+  const { status, user, refresh } = useAuth();
 
-  const handleNavigate = useCallback((page) => {
-    setActivePage(page);
-    setSidebarOpen(false);
-  }, []);
+  if (status === 'loading') {
+    return <div className="splash"><div className="spinner" /></div>;
+  }
 
-  const closeAll = useCallback(() => {
-    setSidebarOpen(false);
-    setChatOpen(false);
-  }, []);
-
-  const anyOpen = sidebarOpen || chatOpen;
+  if (status === 'offline') {
+    return (
+      <AuthShell title="Sin conexión con el servidor" subtitle="No pudimos contactar al backend. Verifica que esté en ejecución e inténtalo de nuevo.">
+        <button className="auth-submit" onClick={refresh}>Reintentar</button>
+      </AuthShell>
+    );
+  }
 
   return (
-    <div className="app-root">
-      <Topbar
-        backendOnline={backendOnline}
-        onMenuToggle={() => setSidebarOpen(o => !o)}
-        onChatToggle={() => setChatOpen(o => !o)}
-        pendingEscalations={metrics.pendingEscalations || 0}
-        onNotifClick={() => handleNavigate('escalations')}
-      />
-      <div className="app-body">
-        {anyOpen && <div className="drawer-overlay active" onClick={closeAll} />}
-        <Sidebar
-          activePage={activePage}
-          onNavigate={handleNavigate}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
-        <MainContent
-          activePage={activePage}
-          metrics={metrics}
-          backendOnline={backendOnline}
-          loading={loading}
-          lastUpdated={lastUpdated}
-        />
-        <ChatPanel
-          backendOnline={backendOnline}
-          isOpen={chatOpen}
-          onClose={() => setChatOpen(false)}
-        />
-      </div>
-    </div>
+    <Routes>
+      {/* El enlace del correo debe funcionar con o sin sesión abierta */}
+      <Route path="/reset-password" element={<ResetPassword />} />
+      {status === 'authed' && user?.mustChangePassword ? (
+        // Contraseña temporal: nada del panel hasta definir una propia (el backend también lo exige)
+        <Route path="*" element={<ForceChangePassword />} />
+      ) : status === 'authed' ? (
+        <>
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/forgot-password" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<AppShell />} />
+        </>
+      ) : (
+        <>
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </>
+      )}
+    </Routes>
   );
 }

@@ -3,8 +3,11 @@
 // Ecoturismo La Yeguada OBC — Chatbot Backend
 // Stack: Express + node-nlp (NaturalLanguageProcessorEs)
 // ─────────────────────────────────────────────────────────────
+require('./env'); // carga .env antes que cualquier otro módulo
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const {
   trainModel, processMessage,
   createIntentAndRetrain, updateIntentAndRetrain, deleteIntentAndRetrain,
@@ -12,10 +15,43 @@ const {
 } = require('./nlp');
 const whatsapp = require('./whatsapp');
 const db = require('./db');
+const authRoutes = require('./auth/routes');
+const authStore = require('./auth/store');
+const authCfg = require('./auth/config');
+const { seedAdminFromEnv } = require('./auth/seed');
+const usersRoutes = require('./auth/users');
+const { loadSession, requirePasswordSet, requireRole } = require('./auth/middleware');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+if (process.env.TRUST_PROXY) app.set('trust proxy', Number(process.env.TRUST_PROXY) || process.env.TRUST_PROXY);
+app.use(helmet());
+// credentials:true para que el navegador envíe la cookie de sesión; el origen
+// debe ser explícito (nunca '*') — ver CORS_ORIGIN en auth/config.js.
+app.use(cors({ origin: authCfg.CORS_ORIGIN, credentials: true }));
+app.use(express.json({ limit: '100kb' }));
+
+// ── Autenticación ──
+// Públicos: /api/auth/*, /api/health y /api/chat (puede usarlo un widget
+// externo; con límite de peticiones). Todo lo demás de /api exige sesión.
+app.use(loadSession);
+app.use('/api/auth', authRoutes);
+app.get('/api/health', (_, res) => res.json({ status: 'ok', model: 'node-nlp-es', version: '1.0.0' }));
+app.use('/api/chat', rateLimit({ windowMs: 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false }));
+app.use('/api', (req, res, next) => (req.path === '/chat' ? next() : requirePasswordSet(req, res, next)));
+// Autorización por rol: el operador solo LEE (y puede marcar escalamientos como
+// atendidos). Escrituras, WhatsApp (el QR vincula el número) y /users: solo admin.
+app.use('/api', (req, res, next) => {
+  const operatorWrite = req.method === 'PUT' && /^\/escalations\/\d+\/handle$/.test(req.path);
+  const adminOnly = req.path.startsWith('/users') || req.path.startsWith('/whatsapp')
+    || (req.method !== 'GET' && !operatorWrite && req.path !== '/chat');
+  return adminOnly ? requireRole('admin')(req, res, next) : next();
+});
+app.use('/api/users', usersRoutes);
+if (authCfg.IS_PROD && !require('./mail').isConfigured()) {
+  console.warn('⚠️  RESEND_API_KEY no configurada: no se enviarán correos (recuperación de contraseña, invitaciones).');
+}
+authStore.purgeExpired();
+setInterval(authStore.purgeExpired, 60 * 60 * 1000).unref();
 
 // Pagina un array ya cargado en memoria — suficiente para el volumen de
 // datos de este proyecto, evita repetir LIMIT/OFFSET en cada query SQL.
@@ -30,6 +66,7 @@ function paginate(items, { page, pageSize } = {}) {
 
 // ── Entrenar y levantar servidor ──
 (async () => {
+  await seedAdminFromEnv();
   await trainModel();
 
   // ── ENDPOINTS ──
@@ -186,9 +223,6 @@ function paginate(items, { page, pageSize } = {}) {
     res.json({ ok: true });
   });
 
-  // GET /api/health
-  app.get('/api/health', (_, res) => res.json({ status: 'ok', model: 'node-nlp-es', version: '1.0.0' }));
-
   // ── Configuración — persistida en SQLite ──
 
   // GET /api/config — Configuración actual (umbral de confianza, números de staff)
@@ -236,8 +270,9 @@ function paginate(items, { page, pageSize } = {}) {
     res.json(await whatsapp.reconnect());
   });
 
-  app.listen(3001, () => {
-    console.log('La Yeguada Chatbot Backend corriendo en http://localhost:3001');
+  const PORT = Number(process.env.PORT) || 3001;
+  app.listen(PORT, () => {
+    console.log(`La Yeguada Chatbot Backend corriendo en http://localhost:${PORT}`);
     console.log('   POST /api/chat              — Clasificar mensaje');
     console.log('   GET  /api/metrics           — Métricas del dashboard');
     console.log('   GET  /api/intents           — Listar intenciones (CRUD completo)');

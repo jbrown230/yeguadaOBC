@@ -1,7 +1,10 @@
-// pages/Config.jsx
+// pages/Config.jsx — configuración del sistema (solo admin). Tres secciones, lista agrupada.
 import React, { useState, useEffect, useCallback } from 'react';
 import { useWhatsapp } from '../hooks/useWhatsapp';
 import { fetchConfig, updateConfig } from '../services/api';
+import { SettingsLayout, Group, Row, Status } from '../components/Settings';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 const WA_LABELS = {
   disconnected: 'Desconectado',
@@ -12,39 +15,14 @@ const WA_LABELS = {
   disconnecting: 'Desconectando…',
 };
 const WA_PENDING = ['initializing', 'qr', 'authenticated', 'disconnecting'];
-
-const Field = ({ label, value, type = 'text', readOnly = false, onChange }) => (
-  <div className="field">
-    <label className="field-label">{label}</label>
-    <input
-      className="input"
-      type={type}
-      defaultValue={value}
-      readOnly={readOnly}
-      onChange={onChange}
-    />
-  </div>
-);
-
-const Section = ({ title, children }) => (
-  <div className="panel panel-pad" style={{ marginBottom: 14 }}>
-    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, color: 'var(--text)' }}>
-      {title}
-    </div>
-    {children}
-  </div>
-);
-
-// Mismo badge con punto pulsante para "Backend node-nlp" e "Integración
-// WhatsApp" — antes repetido literal en ambas secciones.
-const StatusBanner = ({ ok, label }) => (
-  <div className={`status-badge ${ok ? 'resolved' : 'escalated'}`} style={{ marginBottom: 16, padding: '7px 12px', fontSize: 12 }}>
-    <span className={`status-dot ${ok ? 'on' : 'off'}`} />
-    {label}
-  </div>
-);
+const TABS = [
+  { id: 'chatbot', label: 'Chatbot' },
+  { id: 'whatsapp', label: 'WhatsApp' },
+  { id: 'system', label: 'Sistema' },
+];
 
 export default function Config({ backendOnline }) {
+  const [tab, setTab] = useState('chatbot');
   const [threshold, setThreshold] = useState(70);
   const [savedThreshold, setSavedThreshold] = useState(70);
   const [staffNumbersText, setStaffNumbersText] = useState('');
@@ -53,6 +31,17 @@ export default function Config({ backendOnline }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const wa = useWhatsapp();
+  const toast = useToast();
+  const confirm = useConfirm();
+
+  async function confirmDisconnect() {
+    const ok = await confirm({
+      title: '¿Desconectar WhatsApp?',
+      message: 'Se desvincula el dispositivo: el bot dejará de responder por WhatsApp y la próxima vez pedirá escanear un nuevo código QR.',
+      confirmLabel: 'Desconectar', tone: 'danger',
+    });
+    if (ok) { await wa.disconnect(); toast.info('WhatsApp desconectado'); }
+  }
 
   const loadConfig = useCallback(async () => {
     try {
@@ -82,9 +71,11 @@ export default function Config({ backendOnline }) {
       setSavedStaffNumbersText(staffNumbersText);
       setError(null);
       setSaved(true);
+      toast.success('Configuración guardada');
       setTimeout(() => setSaved(false), 2000);
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || 'No se pudo guardar la configuración');
     } finally {
       setSaving(false);
     }
@@ -99,127 +90,103 @@ export default function Config({ backendOnline }) {
   const waStatus = wa.status.status;
   const waConnected = waStatus === 'connected';
   const waLabel = backendOnline
-    ? (wa.unavailable ? 'No se pudo consultar el estado del bot' : (WA_LABELS[waStatus] || waStatus))
-    : 'Backend offline — no se puede controlar el bot';
+    ? (wa.unavailable ? 'No se pudo consultar' : (WA_LABELS[waStatus] || waStatus))
+    : 'Backend offline';
 
   return (
-    <div className="page-enter" style={{ maxWidth: 700 }}>
-      <div className="page-head">
-        <div>
-          <h1 className="page-title">Configuración del Sistema</h1>
-          <div className="page-sub">Parámetros del backend, umbral de confianza y escalamiento</div>
-        </div>
-      </div>
+    <>
+      <SettingsLayout
+        title="Configuración"
+        subtitle="Ajustes del chatbot, WhatsApp y el sistema"
+        tabs={TABS} active={tab} onChange={setTab}
+      >
+        {tab === 'chatbot' && (
+          <>
+            <Group
+              title="Confianza"
+              note={`Las consultas con puntaje menor a ${threshold}% se escalan automáticamente a una persona.`}
+            >
+              <Row label="Umbral de confianza" desc="Qué tan seguro debe estar el bot para responder solo." stack>
+                <div className="slider-row">
+                  <span className="slider-end">Permisivo</span>
+                  <input type="range" min={50} max={95} value={threshold} onChange={(e) => setThreshold(Number(e.target.value))} aria-label="Umbral de confianza" />
+                  <span className="slider-end">Estricto</span>
+                  <span className="value-pill">{threshold}%</span>
+                </div>
+              </Row>
+            </Group>
 
-      <Section title="Backend node-nlp">
-        <StatusBanner
-          ok={backendOnline}
-          label={backendOnline ? 'Backend conectado y respondiendo' : 'Backend offline — ejecute: npm start en yeguada-backend/'}
-        />
-        <div className="fields-2">
-          <Field label="Host" value="localhost" readOnly />
-          <Field label="Puerto" value="3001" readOnly />
-          <Field label="Endpoint" value="POST /api/chat" readOnly />
-          <Field label="Idioma NLP" value="Español (es)" readOnly />
-        </div>
-
-        <div className="field">
-          <label className="field-label">
-            Umbral de confianza (threshold): <span className="mono">{threshold}%</span>
-          </label>
-          <input type="range" min={50} max={95} value={threshold} onChange={e => setThreshold(Number(e.target.value))} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--text-ter)', marginTop: 4 }}>
-            <span>50% (más permisivo)</span>
-            <span>95% (más estricto)</span>
-          </div>
-          <p style={{ fontSize: 11.5, color: 'var(--text-sec)', marginTop: 8 }}>
-            Consultas con score &lt; {threshold}% serán escaladas automáticamente a un operador humano.
-          </p>
-        </div>
-      </Section>
-
-      <Section title="Integración WhatsApp">
-        <StatusBanner ok={waConnected} label={waLabel} />
-
-        <div className="fields-2">
-          <Field label="Proveedor" value="whatsapp-web.js (no oficial)" readOnly />
-          <Field label="Método de conexión" value="Código QR — Dispositivos vinculados" readOnly />
-          <Field label="Sesión" value="Guardada en yeguada-backend/.wwebjs_auth/" readOnly />
-          <Field label="Número vinculado" value={wa.status.info?.number ? `+${wa.status.info.number}` : '—'} readOnly />
-        </div>
-
-        {waStatus === 'qr' && wa.status.qr && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '10px 0 18px' }}>
-            <img
-              src={wa.status.qr}
-              alt="Código QR para vincular WhatsApp"
-              style={{ width: 200, height: 200, borderRadius: 8, border: '1px solid var(--border-strong)' }}
-            />
-            <p style={{ fontSize: 11.5, color: 'var(--text-sec)', textAlign: 'center', maxWidth: 340 }}>
-              Escanéalo desde WhatsApp → Configuración → Dispositivos vinculados → Vincular un dispositivo.
-            </p>
-          </div>
+            <Group
+              title="Escalamiento"
+              note="Cuando el bot escale una conversación, se avisa por WhatsApp a estos números. Déjalo vacío para desactivar el aviso. Requiere el bot conectado."
+            >
+              <Row label="Números del equipo" desc="Con código de país, separados por coma." stack>
+                <input
+                  className="input" type="text" value={staffNumbersText}
+                  onChange={(e) => setStaffNumbersText(e.target.value)}
+                  placeholder="50761234567, 50798765432"
+                />
+              </Row>
+            </Group>
+          </>
         )}
 
-        <div style={{ display: 'flex', gap: 8 }}>
-          {waStatus === 'disconnected' && (
-            <button className="btn btn-primary" onClick={wa.connect} disabled={wa.busy || !backendOnline}>
-              Conectar
-            </button>
-          )}
-          {waConnected && (
-            <button className="btn btn-secondary" onClick={wa.reconnect} disabled={wa.busy || !backendOnline}>
-              Reconectar
-            </button>
-          )}
-          {(waConnected || WA_PENDING.includes(waStatus)) && (
-            <button className="btn btn-danger-ghost" onClick={wa.disconnect} disabled={wa.busy || !backendOnline}>
-              Desconectar
-            </button>
-          )}
-        </div>
+        {tab === 'whatsapp' && (
+          <>
+            <Group title="Conexión">
+              <Row label="Estado"><Status ok={waConnected}>{waLabel}</Status></Row>
+              <Row label="Número vinculado">
+                <span className="settings-value">{wa.status.info?.number ? `+${wa.status.info.number}` : '—'}</span>
+              </Row>
+              <Row label="Acciones">
+                <div className="row-actions">
+                  {waStatus === 'disconnected' && (
+                    <button className="btn btn-primary btn-sm" onClick={wa.connect} disabled={wa.busy || !backendOnline}>Conectar</button>
+                  )}
+                  {waConnected && (
+                    <button className="btn btn-secondary btn-sm" onClick={wa.reconnect} disabled={wa.busy || !backendOnline}>Reconectar</button>
+                  )}
+                  {(waConnected || WA_PENDING.includes(waStatus)) && (
+                    <button className="btn btn-danger-ghost btn-sm" onClick={confirmDisconnect} disabled={wa.busy || !backendOnline}>Desconectar</button>
+                  )}
+                </div>
+              </Row>
+            </Group>
 
-        <p style={{ fontSize: 11.5, color: 'var(--text-sec)', marginTop: 12 }}>
-          No requiere cuenta de Meta Business ni webhook — vincula un número real de WhatsApp directamente desde este panel.
-          "Desconectar" desvincula el dispositivo (pedirá un nuevo QR la próxima vez); "Reconectar" solo reinicia el bot reutilizando la sesión actual.
-        </p>
-      </Section>
+            {waStatus === 'qr' && wa.status.qr && (
+              <Group title="Vincular dispositivo" note="Escanéalo desde WhatsApp → Configuración → Dispositivos vinculados → Vincular un dispositivo.">
+                <div className="qr-box">
+                  <img src={wa.status.qr} alt="Código QR para vincular WhatsApp" />
+                </div>
+              </Group>
+            )}
 
-      <Section title="Escalamiento a Humano">
-        {[
-          { label: 'Intenciones desconocidas', checked: true },
-          { label: 'Score NLP menor al umbral', checked: true },
-          { label: 'Palabras clave críticas (urgente, problema, queja)', checked: true },
-          { label: 'Más de 3 mensajes sin resolución', checked: false },
-        ].map((opt, i) => (
-          <label key={i} className="checkbox-row">
-            <input type="checkbox" defaultChecked={opt.checked} />
-            <span>{opt.label}</span>
-          </label>
-        ))}
+            <p className="settings-note" style={{ marginTop: 4 }}>
+              No requiere cuenta de Meta Business ni webhook: vincula un número real directamente desde aquí.
+              “Desconectar” desvincula el dispositivo (pedirá un nuevo QR); “Reconectar” solo reinicia el bot con la sesión actual.
+            </p>
+          </>
+        )}
 
-        <div className="field" style={{ marginTop: 16 }}>
-          <label className="field-label">Números de WhatsApp del staff (notificaciones)</label>
-          <input
-            className="input"
-            type="text"
-            value={staffNumbersText}
-            onChange={(e) => setStaffNumbersText(e.target.value)}
-            placeholder="ej: 50761234567, 50798765432 (con código de país, separados por coma)"
-          />
-          <p style={{ fontSize: 11.5, color: 'var(--text-sec)', marginTop: 8 }}>
-            Cuando el bot escale una conversación (de WhatsApp o del chat de este dashboard), se le reenvía un aviso por WhatsApp a cada número de esta lista. Déjalo vacío para desactivar esta notificación. Requiere que el bot esté conectado (ver Integración WhatsApp arriba).
-          </p>
-        </div>
-      </Section>
+        {tab === 'system' && (
+          <Group title="Servidor" note="Información de solo lectura.">
+            <Row label="Backend"><Status ok={backendOnline}>{backendOnline ? 'Conectado' : 'Sin conexión'}</Status></Row>
+            <Row label="Dirección"><span className="settings-value">localhost:3001</span></Row>
+            <Row label="Endpoint de chat"><span className="settings-value">POST /api/chat</span></Row>
+            <Row label="Idioma del NLP"><span className="settings-value">Español</span></Row>
+            <Row label="Proveedor de WhatsApp"><span className="settings-value">whatsapp-web.js</span></Row>
+            <Row label="Sesión de WhatsApp"><span className="settings-value mono-ish">yeguada-backend/.wwebjs_auth/</span></Row>
+          </Group>
+        )}
+      </SettingsLayout>
 
-      {error && <p style={{ fontSize: 12, color: 'var(--danger)', textAlign: 'right', marginBottom: 10 }}>{error}</p>}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-        <button className="btn btn-secondary" onClick={handleCancel} disabled={saving || !dirty}>Cancelar</button>
-        <button onClick={handleSave} className={`btn btn-primary ${saved ? 'is-success' : ''}`} disabled={saving || !dirty}>
-          {saving ? 'Guardando…' : saved ? 'Guardado' : 'Guardar Cambios'}
+      <div className={`save-bar${dirty ? ' visible' : ''}`} aria-hidden={!dirty}>
+        <span className="save-bar-msg">{error ? <span style={{ color: 'var(--danger)' }}>{error}</span> : 'Tienes cambios sin guardar'}</span>
+        <button className="btn btn-ghost" onClick={handleCancel} disabled={saving || !dirty} tabIndex={dirty ? 0 : -1}>Cancelar</button>
+        <button onClick={handleSave} className={`btn btn-primary ${saved ? 'is-success' : ''}`} disabled={saving || !dirty} tabIndex={dirty ? 0 : -1}>
+          {saving ? 'Guardando…' : saved ? 'Guardado' : 'Guardar cambios'}
         </button>
       </div>
-    </div>
+    </>
   );
 }

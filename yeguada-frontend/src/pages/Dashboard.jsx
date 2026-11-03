@@ -1,9 +1,10 @@
 // pages/Dashboard.jsx
 import React, { useState, useCallback } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from 'recharts';
+import { useAuth } from '../context/AuthContext';
 import KpiCard from '../components/Kpicard';
 import Icon from '../components/Icon';
 import Pagination from '../components/Pagination';
@@ -11,12 +12,15 @@ import UserCell from '../components/UserCell';
 import StatusBadge from '../components/StatusBadge';
 import { useLiveRefresh } from '../hooks/useLiveRefresh';
 import { formatDateTime } from '../utils/format';
+import { intentLabel } from '../utils/intents';
+import EmojiText from '../components/EmojiText';
 import { fetchTimeseries, fetchConversationHistory, fetchConversations } from '../services/api';
 
-const PIE_COLORS = ['#396B2C', '#FFA700', '#8A5A12', '#7B8190', '#A3312A', '#454A54'];
+const PIE_COLORS = ['var(--pie-1)', 'var(--pie-2)', 'var(--pie-3)', 'var(--pie-4)', 'var(--pie-5)', 'var(--pie-6)'];
 const CONV_PAGE_SIZE = 10;
 
 export default function Dashboard({ metrics }) {
+  const { user } = useAuth();
   const [range, setRange] = useState('week');
   const [timeseries, setTimeseries] = useState({ week: [], month: [] });
   const [selectedSession, setSelectedSession] = useState(null);
@@ -68,18 +72,12 @@ export default function Dashboard({ metrics }) {
   const chartData = range === 'week' ? timeseries.week : timeseries.month;
 
   // Build pie data from intentCounts
-  const intentLabels = {
-    'booking.tour':        'Reserva Tours',
-    'guide.availability':  'Dispon. Guía',
-    'pricing.info':        'Precios',
-    'general.info':        'Info General',
-    'camping.info':        'Camping',
-    'waterfall.info':      'Cascadas',
-  };
-  const pieData = Object.entries(metrics.intentCounts || {}).map(([k, v]) => ({
-    name: intentLabels[k] || k,
-    value: v,
-  }));
+  // Top 5 intenciones + "Otras": más de ~6 rebanadas no se leen ni se distinguen.
+  const sorted = Object.entries(metrics.intentCounts || {})
+    .map(([k, v]) => ({ name: intentLabel(k), value: v }))
+    .sort((a, b) => b.value - a.value);
+  const rest = sorted.slice(5).reduce((sum, d) => sum + d.value, 0);
+  const pieData = rest > 0 ? [...sorted.slice(0, 5), { name: 'Otras', value: rest }] : sorted;
 
   const avgSec = (metrics.avgResponseTimeMs / 1000).toFixed(1);
 
@@ -87,17 +85,17 @@ export default function Dashboard({ metrics }) {
     <div className="page-enter">
       <div className="page-head">
         <div>
-          <h1 className="page-title">Panel de Control</h1>
-          <div className="page-sub">Rendimiento del chatbot en tiempo real</div>
+          <h1 className="page-title">Hola, {user?.name?.split(' ')[0]}<span className="emoji-wave"><EmojiText text="👋" /></span></h1>
+          <div className="page-sub">Así va el rendimiento del chatbot en tiempo real</div>
         </div>
       </div>
 
       {/* Stat strip */}
       <div className="stat-strip">
-        <KpiCard label="Total de Chats Hoy" value={metrics.totalChatsToday} sub="↑ 12% vs ayer" />
-        <KpiCard label="Tasa de Resolución" value={`${metrics.resolutionRate}%`} sub="↑ 3% esta semana" />
-        <KpiCard label="Escalados a Humano" value={`${metrics.escalationRate}%`} sub="↓ 1% vs semana pasada" />
-        <KpiCard label="Tiempo Prom. Respuesta" value={`${avgSec}s`} sub="node-nlp local" />
+        <KpiCard icon="chat" label="Total de Chats Hoy" value={metrics.totalChatsToday} sub="↑ 12% vs ayer" />
+        <KpiCard icon="check" label="Tasa de Resolución" value={`${metrics.resolutionRate}%`} sub="↑ 3% esta semana" />
+        <KpiCard icon="users" tone="gold" label="Escalados a Humano" value={`${metrics.escalationRate}%`} sub="↓ 1% vs semana pasada" />
+        <KpiCard icon="clock" tone="gray" label="Tiempo Prom. Respuesta" value={`${avgSec}s`} sub="node-nlp local" />
       </div>
 
       {/* Charts Row */}
@@ -116,7 +114,7 @@ export default function Dashboard({ metrics }) {
           </div>
 
           <div className="legend-row">
-            {[{ label: 'Chatbot', color: '#396B2C' }, { label: 'Humano', color: '#9CA2AF' }].map(l => (
+            {[{ label: 'Chatbot', color: 'var(--chart-bot)' }, { label: 'Humano', color: 'var(--chart-hum)' }].map(l => (
               <div key={l.label} className="legend-item">
                 <span className="legend-swatch" style={{ background: l.color }} />
                 {l.label}
@@ -124,30 +122,40 @@ export default function Dashboard({ metrics }) {
             ))}
           </div>
 
-          <ResponsiveContainer width="100%" height={170}>
-            <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-100)" vertical={false} />
-              <XAxis dataKey="day" tick={{ fontSize: 10.5, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10.5, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 11.5, borderRadius: 8, border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', fontFamily: 'var(--font-sans)' }} />
-              <Line type="monotone" dataKey="chatbot" stroke="#396B2C" strokeWidth={2} dot={{ r: 3, fill: '#396B2C', strokeWidth: 0 }} activeDot={{ r: 5 }} />
-              <Line type="monotone" dataKey="humano" stroke="#9CA2AF" strokeWidth={2} dot={{ r: 3, fill: '#9CA2AF', strokeWidth: 0 }} activeDot={{ r: 5 }} />
-            </LineChart>
+          <ResponsiveContainer width="100%" height={240}>
+            <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -18 }}>
+              <defs>
+                <linearGradient id="gBot" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" style={{ stopColor: 'var(--chart-bot)' }} stopOpacity={0.3} />
+                  <stop offset="100%" style={{ stopColor: 'var(--chart-bot)' }} stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gHum" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" style={{ stopColor: 'var(--chart-hum)' }} stopOpacity={0.25} />
+                  <stop offset="100%" style={{ stopColor: 'var(--chart-hum)' }} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="4 6" stroke="var(--fill-2)" vertical={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 12, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 12, fill: 'var(--text-ter)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip cursor={{ stroke: 'var(--fill-3)' }} contentStyle={{ fontSize: 13, borderRadius: 14, border: 'none', boxShadow: 'var(--shadow-md)', fontFamily: 'var(--font-sans)', background: 'var(--surface)', color: 'var(--text)' }} />
+              <Area type="monotone" dataKey="chatbot" stroke="var(--chart-bot)" strokeWidth={2.5} fill="url(#gBot)" dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Area type="monotone" dataKey="humano" stroke="var(--chart-hum)" strokeWidth={2.5} fill="url(#gHum)" dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
 
         {/* Pie Chart */}
         <div className="panel panel-pad">
-          <div className="panel-title" style={{ marginBottom: 12 }}>Principales Intenciones</div>
-          <ResponsiveContainer width="100%" height={190}>
+          <div className="panel-title" style={{ marginBottom: 12 }}>Principales intenciones</div>
+          <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" innerRadius={48} outerRadius={72} dataKey="value" paddingAngle={2} stroke="var(--surface)" strokeWidth={2}>
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={64} outerRadius={96} dataKey="value" paddingAngle={3} cornerRadius={6} stroke="var(--surface)" strokeWidth={2}>
                 {pieData.map((_, i) => (
                   <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                 ))}
               </Pie>
-              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10.5, fontFamily: 'var(--font-sans)' }} />
-              <Tooltip contentStyle={{ fontSize: 11.5, borderRadius: 8, border: '1px solid var(--border)', fontFamily: 'var(--font-sans)' }} />
+              <Legend formatter={(v) => <span style={{ color: 'var(--text-sec)' }}>{v}</span>} iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 12, fontFamily: 'var(--font-sans)' }} />
+              <Tooltip contentStyle={{ fontSize: 13, borderRadius: 14, border: 'none', boxShadow: 'var(--shadow-md)', fontFamily: 'var(--font-sans)', background: 'var(--surface)', color: 'var(--text)' }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -157,7 +165,7 @@ export default function Dashboard({ metrics }) {
       <div className="panel panel-pad">
         <div className="panel-title" style={{ marginBottom: 12 }}>Conversaciones Recientes</div>
         <div className="table-wrap">
-          <table className="table">
+          <table className="table table-cards">
             <thead>
               <tr>
                 {['Usuario', 'Inicio', 'Intención', 'Score NLP', 'Estado', 'Acciones'].map(h => (
@@ -171,10 +179,10 @@ export default function Dashboard({ metrics }) {
               )}
               {convItems.map((c, i) => (
                 <tr key={i}>
-                  <td><UserCell sessionId={c.sessionId} /></td>
-                  <td className="mono" style={{ color: 'var(--text-sec)', whiteSpace: 'nowrap' }}>{formatDateTime(c.time)}</td>
-                  <td><span className="tag tag-accent">{c.intent || '—'}</span></td>
-                  <td>
+                  <td className="cell-main"><UserCell sessionId={c.sessionId} /></td>
+                  <td data-label="Inicio" className="mono" style={{ color: 'var(--text-sec)', whiteSpace: 'nowrap' }}>{formatDateTime(c.time)}</td>
+                  <td data-label="Intención"><span className="tag tag-accent">{c.intent || '—'}</span></td>
+                  <td data-label="Score NLP">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <div className="progress-track" style={{ maxWidth: 60, flex: 1 }}>
                         <div className="progress-fill" style={{ '--fill': c.score || 0, background: c.score >= 0.7 ? 'var(--accent)' : 'var(--warning)' }} />
@@ -182,8 +190,8 @@ export default function Dashboard({ metrics }) {
                       <span className="mono" style={{ fontSize: 11, color: 'var(--text-sec)' }}>{Math.round((c.score || 0) * 100)}%</span>
                     </div>
                   </td>
-                  <td><StatusBadge ok={c.resolved} okLabel="Chatbot" badLabel="Humano" /></td>
-                  <td>
+                  <td data-label="Estado"><StatusBadge ok={c.resolved} okLabel="Chatbot" badLabel="Humano" /></td>
+                  <td className="cell-actions">
                     <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px' }} onClick={() => openDetails(c.sessionId)}>
                       Ver detalles
                     </button>
@@ -232,7 +240,7 @@ export default function Dashboard({ metrics }) {
                       <div className="chat-time">{time}</div>
                     </div>
                     <div className="chat-msg-row bot">
-                      <div className="chat-bubble bot">{h.answer}</div>
+                      <div className="chat-bubble bot"><EmojiText text={h.answer} /></div>
                       <div className="chat-time">{time}</div>
                       {h.intent && h.intent !== 'None' && (
                         <span className="tag tag-accent tag-mono chat-intent-tag">
