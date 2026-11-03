@@ -4,12 +4,14 @@ import { fetchEscalations, markEscalationHandled } from '../services/api';
 import Pagination from '../components/Pagination';
 import UserCell from '../components/UserCell';
 import StatusBadge from '../components/StatusBadge';
+import { useToast } from '../context/ToastContext';
 import { useLiveRefresh } from '../hooks/useLiveRefresh';
 import { formatDateTime } from '../utils/format';
 
 const PAGE_SIZE = 20;
 
 export default function Escalations() {
+  const toast = useToast();
   const [view, setView] = useState('pending'); // 'pending' | 'all'
   const [page, setPage] = useState(1);
   const [items, setItems] = useState([]);
@@ -51,8 +53,9 @@ export default function Escalations() {
     try {
       await markEscalationHandled(id);
       await load();
+      toast.success('Escalamiento marcado como atendido');
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message || 'No se pudo marcar como atendido');
     } finally {
       setHandlingId(null);
     }
@@ -82,7 +85,7 @@ export default function Escalations() {
 
       <div className="panel panel-pad">
         <div className="table-wrap">
-          <table className="table">
+          <table className="table table-cards">
             <thead>
               <tr>
                 {['Usuario', 'Canal', 'Mensaje', 'Intención', 'Hora', 'Estado', 'Acciones'].map((h) => (
@@ -94,19 +97,19 @@ export default function Escalations() {
               {!loading && items.length === 0 && (
                 <tr><td colSpan={7}>
                   <div className="empty-state">
-                    {view === 'pending' ? '🎉 Sin escalamientos pendientes.' : 'Sin escalamientos registrados todavía.'}
+                    {view === 'pending' ? 'Sin escalamientos pendientes.' : 'Sin escalamientos registrados todavía.'}
                   </div>
                 </td></tr>
               )}
               {items.map((c) => (
                 <tr key={c.id}>
-                  <td><UserCell sessionId={c.sessionId} /></td>
-                  <td><span className="tag tag-mono">{c.channel}</span></td>
-                  <td style={{ maxWidth: 280, color: 'var(--text-sec)' }}>{c.message}</td>
-                  <td><span className="tag tag-accent">{c.intent || '—'}</span></td>
-                  <td className="mono" style={{ color: 'var(--text-sec)', whiteSpace: 'nowrap' }}>{formatDateTime(c.time)}</td>
-                  <td><StatusBadge ok={c.handled} okLabel="Atendido" badLabel="Pendiente" /></td>
-                  <td>
+                  <td className="cell-main"><UserCell sessionId={c.sessionId} /></td>
+                  <td data-label="Canal"><span className="tag tag-mono">{c.channel}</span></td>
+                  <td data-label="Mensaje" className="cell-text" style={{ color: 'var(--text-sec)' }}>{c.message}</td>
+                  <td data-label="Intención"><span className="tag tag-accent">{c.intent || '—'}</span></td>
+                  <td data-label="Hora" className="mono" style={{ color: 'var(--text-sec)', whiteSpace: 'nowrap' }}>{formatDateTime(c.time)}</td>
+                  <td data-label="Estado"><StatusBadge ok={c.handled} okLabel="Atendido" badLabel="Pendiente" /></td>
+                  <td className="cell-actions">
                     {!c.handled && (
                       <button
                         className="btn btn-ghost btn-sm"

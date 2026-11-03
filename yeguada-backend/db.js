@@ -55,6 +55,40 @@ db.exec(`
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
   );
+
+  -- Autenticación (ver auth/): usuarios, sesiones y tokens de recuperación.
+  -- Los tokens de sesión y de reset se guardan SOLO como hash SHA-256.
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    name TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'admin',
+    must_change_password INTEGER NOT NULL DEFAULT 0,
+    failed_attempts INTEGER NOT NULL DEFAULT 0,
+    locked_until TEXT,
+    last_login_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS sessions (
+    token_hash TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TEXT NOT NULL,
+    ip TEXT,
+    user_agent TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+
+  CREATE TABLE IF NOT EXISTS password_resets (
+    token_hash TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TEXT NOT NULL,
+    used_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);
 `);
 
 // Migración: bases creadas antes de esta feature no tienen estas columnas.
@@ -62,6 +96,12 @@ db.exec(`
   const cols = db.prepare("PRAGMA table_info(conversations)").all().map((c) => c.name);
   if (!cols.includes('handled')) db.exec('ALTER TABLE conversations ADD COLUMN handled INTEGER NOT NULL DEFAULT 0');
   if (!cols.includes('handled_at')) db.exec('ALTER TABLE conversations ADD COLUMN handled_at TEXT');
+}
+
+// Migración: usuarios creados antes del envío de contraseña temporal.
+{
+  const cols = db.prepare("PRAGMA table_info(users)").all().map((c) => c.name);
+  if (!cols.includes('must_change_password')) db.exec('ALTER TABLE users ADD COLUMN must_change_password INTEGER NOT NULL DEFAULT 0');
 }
 
 // ── Slug único a partir del nombre (ids legibles tipo 'booking.tour') ──
@@ -429,6 +469,7 @@ function setStaffWhatsappNumbers(values) {
 }
 
 module.exports = {
+  conn: db, // handle crudo, usado por auth/store.js
   listIntents, getIntent, createIntent, updateIntent, deleteIntent,
   listKb, createKb, updateKb, deleteKb, getKbEntriesByIntent,
   recordConversation, getMetrics, resetMetrics, getTimeseries, getActiveSessions,

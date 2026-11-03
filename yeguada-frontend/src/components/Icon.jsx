@@ -20,6 +20,18 @@ const paths = {
   clock: <><circle cx="12" cy="12" r="8.5" /><polyline points="12 7.5 12 12 15.5 14" /></>,
   chevronRight: <polyline points="9 6 15 12 9 18" />,
   users: <><circle cx="9" cy="8.5" r="3" /><path d="M2.8 19c.6-3 3-5 6.2-5s5.6 2 6.2 5" /><path d="M16 5.3c1.5.4 2.6 1.7 2.6 3.3 0 1.6-1.1 2.9-2.6 3.3" /><path d="M18.8 19c-.4-2-1.5-3.6-3.1-4.5" /></>,
+  eye: <><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></>,
+  eyeOff: <><path d="M4 4l16 16" /><path d="M9.9 5.7A9.8 9.8 0 0 1 12 5.5c6.4 0 10 6.5 10 6.5a17 17 0 0 1-3.2 3.9" /><path d="M6.2 7.3A16.6 16.6 0 0 0 2 12s3.6 6.5 10 6.5c1.5 0 2.8-.3 4-.9" /><path d="M10 10a3 3 0 0 0 4 4" /></>,
+  mail: <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m4 7.5 8 6 8-6" /></>,
+  lock: <><rect x="4.5" y="10.5" width="15" height="10" rx="3" /><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" /></>,
+  user: <><circle cx="12" cy="8" r="3.5" /><path d="M5 20c.8-3.6 3.5-5.5 7-5.5s6.2 1.9 7 5.5" /></>,
+  logout: <><path d="M10 4.5H6.5A2 2 0 0 0 4.5 6.5v11a2 2 0 0 0 2 2H10" /><path d="M15 8l4 4-4 4" /><line x1="19" y1="12" x2="9.5" y2="12" /></>,
+  check: <polyline points="5 12.5 10 17.5 19 7" />,
+  shield: <><path d="M12 3.5 5 6v5.5c0 4.3 2.9 7.6 7 9 4.1-1.4 7-4.7 7-9V6l-7-2.5Z" /><polyline points="9 12 11.2 14.2 15 10" /></>,
+  sun: <><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" /></>,
+  moon: <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />,
+  desktop: <><rect x="3" y="4.5" width="18" height="12" rx="2.5" /><path d="M8.5 20h7M12 16.5V20" /></>,
+  arrowLeft: <><line x1="19" y1="12" x2="5" y2="12" /><polyline points="11 6 5 12 11 18" /></>,
 };
 
 export default function Icon({ name, size = 18, strokeWidth = 1.75, className, style }) {

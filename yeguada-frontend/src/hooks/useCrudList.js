@@ -1,23 +1,33 @@
 // hooks/useCrudList.js
-// Estado de "lista con alta/edición/borrado" repetido casi idéntico entre
-// Intents.jsx y KnowledgeBase.jsx (load/error/loading, formulario de
-// alta-o-edición, guardar, borrar). Cada página define su propia forma de
-// formulario y de payload — este hook solo orquesta el ciclo de vida.
-import { useState, useEffect, useCallback } from 'react';
+// Ciclo de vida de una "lista con alta/edición/borrado" (Intents y Base de Conocimiento):
+// carga, panel de edición, validación por campo, guardado, borrado con confirmación y
+// avisos de resultado. Cada página define su forma de formulario y de payload.
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 export function useCrudList({
   fetchFn, createFn, updateFn, deleteFn,
-  emptyForm, toForm, toPayload, validate,
+  emptyForm, toForm, toPayload,
+  validate,                       // (form) => ({ campo: 'mensaje' }) — vacío = válido
   getId = (item) => item.id,
   loadErrorMessage = 'No se pudo cargar — ¿el backend está corriendo?',
+  messages = {},                  // { created, updated, deleted } textos de los avisos
 }) {
+  const toast = useToast();
+  const confirm = useConfirm();
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [adding, setAdding] = useState(false);
+  const [adding, setAdding] = useState(false);       // panel abierto
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
+  const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const initialRef = useRef(JSON.stringify(emptyForm));
+
+  const dirty = adding && JSON.stringify(form) !== initialRef.current;
 
   const load = useCallback(async () => {
     try {
@@ -32,56 +42,80 @@ export function useCrudList({
 
   useEffect(() => { load(); }, [load]);
 
-  function startAdd(initial) {
-    setForm(initial ? { ...emptyForm, ...initial } : emptyForm);
-    setEditingId(null);
+  function open(nextForm, id) {
+    setForm(nextForm);
+    initialRef.current = JSON.stringify(nextForm);
+    setEditingId(id);
+    setErrors({});
     setAdding(true);
   }
+  const startAdd = (initial) => open(initial ? { ...emptyForm, ...initial } : emptyForm, null);
+  const startEdit = (item) => open(toForm(item), getId(item));
 
-  function startEdit(item) {
-    setForm(toForm(item));
-    setEditingId(getId(item));
-    setAdding(true);
-  }
-
-  function cancelForm() {
+  const closeNow = useCallback(() => {
     setAdding(false);
     setEditingId(null);
-    setForm(emptyForm);
-  }
+    setErrors({});
+  }, []);
 
-  async function handleSave() {
-    const payload = toPayload(form);
-    if (validate && !validate(payload)) return;
+  // Cerrar con confirmación si hay cambios sin guardar
+  const requestClose = useCallback(async () => {
+    if (saving) return;
+    if (dirty && !(await confirm({
+      title: '¿Descartar los cambios?',
+      message: 'Hiciste modificaciones que no se han guardado.',
+      confirmLabel: 'Descartar',
+      cancelLabel: 'Seguir editando',
+      tone: 'danger',
+    }))) return;
+    closeNow();
+  }, [saving, dirty, confirm, closeNow]);
 
+  const setField = (key, value) => {
+    setForm((f) => ({ ...f, [key]: value }));
+    setErrors((e) => (e[key] ? { ...e, [key]: undefined } : e));
+  };
+
+  async function handleSave(e) {
+    e?.preventDefault();
+    if (saving) return;
+    const found = validate ? validate(form) : {};
+    if (Object.values(found).some(Boolean)) {
+      setErrors(found);
+      document.querySelector('.sheet [aria-invalid="true"], .sheet .invalid input')?.focus();
+      return;
+    }
     setSaving(true);
     try {
-      if (editingId !== null) {
-        await updateFn(editingId, payload);
-      } else {
-        await createFn(payload);
-      }
+      const payload = toPayload(form);
+      if (editingId !== null) await updateFn(editingId, payload);
+      else await createFn(payload);
+      toast.success(editingId !== null ? (messages.updated || 'Cambios guardados') : (messages.created || 'Creado correctamente'));
+      closeNow();
       await load();
-      cancelForm();
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message || 'No se pudo guardar. Inténtalo de nuevo.');
     } finally {
       setSaving(false);
     }
   }
 
-  async function handleDelete(id) {
+  // `ask`: { title, message, confirmLabel } — texto del diálogo de confirmación
+  async function handleDelete(item, ask) {
+    const ok = await confirm({ confirmLabel: 'Eliminar', tone: 'danger', ...ask });
+    if (!ok) return;
     try {
-      await deleteFn(id);
+      await deleteFn(getId(item));
+      toast.success(messages.deleted || 'Eliminado correctamente');
       await load();
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message || 'No se pudo eliminar. Inténtalo de nuevo.');
     }
   }
 
   return {
-    items, loading, error, setError,
-    adding, editingId, form, setForm, saving,
-    load, startAdd, startEdit, cancelForm, handleSave, handleDelete,
+    items, loading, error,
+    adding, editingId, form, setField, errors, saving, dirty,
+    load, startAdd, startEdit, requestClose, handleSave, handleDelete,
   };
 }
